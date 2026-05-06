@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: "Manrope", sans-serif;
+  
+  --color-brand-primary: #4f378a;
+  --color-brand-primary-light: #6750a4;
+  --color-brand-surface: #fdf7ff;
+  --color-brand-tertiary: #ffdf93;
+  --color-brand-on-surface: #1d1b20;
+  --color-brand-on-surface-variant: #494551;
+  --color-brand-outline: #7a7582;
+  --color-brand-outline-variant: #cbc4d2;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-surface text-brand-on-surface antialiased font-sans;
+  }
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-primary-light) 100%);
+}

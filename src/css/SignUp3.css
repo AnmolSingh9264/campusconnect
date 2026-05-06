@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", sans-serif;
+  
+  --color-primary: #4f378a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #6750a4;
+  --color-on-primary-container: #e0d2ff;
+  --color-primary-fixed-dim: #cfbcff;
+  
+  --color-secondary: #63597c;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e1d4fd;
+  --color-on-secondary-container: #645a7d;
+  
+  --color-tertiary: #765b00;
+  --color-tertiary-fixed-dim: #e7c365;
+  
+  --color-background: #fdf7ff;
+  --color-on-background: #1d1b20;
+  
+  --color-surface: #fdf7ff;
+  --color-on-surface: #1d1b20;
+  --color-on-surface-variant: #494551;
+  --color-outline: #7a7582;
+  --color-outline-variant: #cbc4d2;
+  
+  --color-surface-container-low: #f8f2fa;
+  --color-surface-container-high: #ece6ee;
+  
+  --shadow-glass: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

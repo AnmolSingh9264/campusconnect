@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-manrope: "Manrope", sans-serif;
+
+  --color-primary: #4f378a;
+  --color-primary-container: #6750a4;
+  --color-surface: #fdf7ff;
+  --color-on-surface: #1d1b20;
+  --color-error: #ba1a1a;
+  --color-background: #fdf7ff;
+  --color-surface-container: #f2ecf4;
+  
+  --shadow-elite: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  .primary-gradient {
+    background: linear-gradient(135deg, #4f378a 0%, #6750a4 100%);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Custom scrollbar for course scroll */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
