@@ -8,7 +8,7 @@ import {
   ArrowRight, 
   ArrowLeft 
 } from 'lucide-react';
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 import "../../src/css/SignUp1.css";

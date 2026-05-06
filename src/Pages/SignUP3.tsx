@@ -28,10 +28,6 @@ export default function SignUP3() {
   const { checkIsVerified } = useAuth();
   const email = location.state.useremail;
 
-  const handleVerifyClick = () => {
-    window.location.href = "https://mail.google.com/";
-  };
-
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {

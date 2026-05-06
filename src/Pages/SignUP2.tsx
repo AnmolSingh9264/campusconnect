@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
   Sparkles,
   User,
@@ -17,12 +17,12 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
-import { useUser, useUpdateUser } from "../features/user/userHooks";
+//import { useUpdateUser } from "../features/user/userHooks";
 import "../../src/css/SignUp2.css";
 
 export default function SignUP2() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+ // const { user } = useAuth();
   const [university, setUniversity] = useState("");
   const [course, setCourse] = useState("");
   const [branch, setBranch] = useState("");
@@ -37,9 +37,9 @@ export default function SignUP2() {
   const [fullname, setFullName] = useState("");
   const [isTermsAccepted, setTermsAccepted] = useState(false);
 
-  const { mutateAsync } = useUpdateUser();
+ // const { mutateAsync } = useUpdateUser();
 
-const saveUser = async () => {
+/*const saveUser = async () => {
 
   if (!validateForm()) return;
 
@@ -59,7 +59,7 @@ const saveUser = async () => {
   } catch (err: any) {
     setError(err.message);
   }
-};
+};*/
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {

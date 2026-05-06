@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import challengeIcon from "@/assets/ic_challenges.png"; 
+//import React, { useState } from 'react';
+//import challengeIcon from "@/assets/ic_challenges.png"; 
 import Login from "./Pages/Login";
 import Landing from "./Pages/Landing";
 import Signup1 from "./Pages/SignUP1";

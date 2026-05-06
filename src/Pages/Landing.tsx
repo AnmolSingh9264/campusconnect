@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import challengeIcon from "@/assets/ic_challenges.png"; 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
@@ -14,16 +14,15 @@ import {
   Settings, 
   ArrowRight, 
   BrainCircuit, 
-  ShieldCheck, 
-  Code2, 
+  ShieldCheck,  
   Bot, 
   Video, 
-  UserCheck, 
+   
   Quote, 
   Globe, 
   Share2, 
   Users, 
-  ChevronRight,
+  
   CheckCircle2,
   Sparkles
 } from 'lucide-react';
