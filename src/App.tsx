@@ -6,6 +6,7 @@ import Signup1 from "./Pages/SignUP1";
 import Signup2 from "./Pages/SignUP2";
 import Signup3 from "./Pages/SignUP3";
 import Dashboard from "./Pages/Dashboard";
+import UpdatePassword from "./Pages/UpdatePassword.tsx";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 
@@ -14,6 +15,8 @@ export default function App() {
     <Routes>
       {/* open landing page */}
       <Route path="/" element={<Landing />} />
+      
+      <Route path="/updatepassword" element={<UpdatePassword/>}/>
 
       <Route element={<GuestGuard />}>
         <Route path="/login" element={<Login />} />

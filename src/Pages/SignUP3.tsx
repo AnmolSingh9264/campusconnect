@@ -16,6 +16,7 @@ import {
 import "../../src/css/SignUp3.css";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Alert } from "./Login.tsx";
 
 export default function SignUP3() {
   const location = useLocation();
@@ -77,34 +78,6 @@ export default function SignUP3() {
       );
     }
     setVerified(false);
-  };
-
-  type AlertProps = {
-    message: string;
-    isSuccess?: boolean;
-    className?: string;
-  };
-
-  const Alert = ({
-    message,
-    isSuccess = false,
-    className = "",
-  }: AlertProps) => {
-    return (
-      <div
-        className={`p-3 rounded-lg text-sm font-medium transition-all ${className}`}
-        style={{
-          margin: 10,
-          color: isSuccess ? "#52c41a" : "#ff4d4f",
-          background: isSuccess
-            ? "rgba(82,196,26,0.08)"
-            : "rgba(255,77,79,0.08)",
-          border: `1px solid ${isSuccess ? "#b7eb8f" : "#ffa39e"}`,
-        }}
-      >
-        {isSuccess ? "✅ " : "❌ "} {message}
-      </div>
-    );
   };
 
   return (

@@ -1,10 +1,12 @@
 import { Bell, Settings, Menu } from 'lucide-react';
+import { useAuth } from '../Context/AuthContext';
 
 interface TopNavProps {
   onOpenMenu: () => void;
 }
 
 export default function TopNav({ onOpenMenu }: TopNavProps) {
+   const { user } = useAuth();
   return (
     <header className="flex items-center justify-between mb-8">
       <div className="flex items-center gap-4">
@@ -12,7 +14,7 @@ export default function TopNav({ onOpenMenu }: TopNavProps) {
           <Menu size={24} />
         </button>
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight font-manrope">Welcome back, Alex!</h2>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight font-manrope">Welcome back, {user?.user_metadata.full_name ?? "Alex"}!</h2>
           <p className="text-slate-500 mt-1 text-sm md:text-base">You have 3 new recruiter views and 1 upcoming interview today.</p>
         </div>
       </div>

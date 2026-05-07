@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #4f378a;
+  --color-primary-container: #6750a4;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #e0d2ff;
+  --color-secondary: #63597c;
+  --color-secondary-container: #e1d4fd;
+  --color-on-secondary-container: #645a7d;
+  --color-surface: #fdf7ff;
+  --color-surface-container-low: #f8f2fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #1d1b20;
+  --color-on-surface-variant: #494551;
+  --color-outline: #7a7582;
+  --color-outline-variant: #cbc4d2;
+  --color-tertiary-container: #c9a74d;
+
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+}
+
+@layer base {
+  body {
+    @apply font-body bg-surface text-on-surface antialiased;
+  }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, #4f378a 0%, #6750a4 100%);
+}
+
+.pattern-overlay {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}

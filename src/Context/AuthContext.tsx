@@ -8,6 +8,8 @@ type AuthContextType = {
   loading: boolean;
   checkIsVerified: () => Promise<boolean>;
   resendEmail: (email: string) => Promise<void>;
+  sendResetLink: (email: string) => Promise<void>;
+  updatePassword:(password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     email: string,
@@ -86,6 +88,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 };
 
+const sendResetLink = async (email: string) => {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "http://localhost:5173/updatepassword",
+  });
+
+  if (error) {
+    console.log(error.message);
+    throw error
+  } else {
+    console.log("Reset email sent");
+  }
+};
+
+const updatePassword = async (password: string) => {
+  const { error } = await supabase.auth.updateUser({
+   password: password
+  });
+
+  if (error) {
+    console.log(error.message);
+    throw error
+  } else {
+    console.log("Reset email sent");
+  }
+};
+
   const signUp = async (
     email: string,
     password: string,
@@ -122,7 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut, resendEmail, checkIsVerified}}
+      value={{ user, session, loading, signIn, signUp, signOut, resendEmail, checkIsVerified, sendResetLink, updatePassword}}
     >
       {children}
     </AuthContext.Provider>

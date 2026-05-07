@@ -10,11 +10,12 @@ import "../../src/css/Login.css";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, sendResetLink } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [error, setError] = useState("");
 
   const validateForm = () => {
@@ -38,6 +39,26 @@ export default function Login() {
       return false;
     }
     return true;
+  };
+
+  const sendPasswordReset = async () => {
+    try {
+       if (!email.trim()) {
+      setError("Email is required");
+      return false;
+    }
+      setResetting(true);
+      console.log("signing in started");
+      await sendResetLink(email);
+      setResetting(false);
+      console.log("password reset link send");
+      setSuccess("Password Reset Link Sent to Your Email");
+    } catch (error: any) {
+      console.error(error.message);
+      setError(error.message);
+    } finally {
+      setResetting(false);
+    }
   };
 
   const handleSignin = async () => {
@@ -251,12 +272,14 @@ export default function Login() {
                 >
                   Password
                 </label>
-                <a
+                <Link
+                to={'#'}
+                onClick={sendPasswordReset}
                   className="text-xs font-bold text-primary hover:text-surface-tint transition-colors"
-                  href="#"
+                 
                 >
-                  Forgot password?
-                </a>
+                 {resetting ? "Sending Reset Link.." : "Forgot password?"}
+                </Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline group-focus-within:text-primary transition-colors" />
@@ -315,8 +338,9 @@ export default function Login() {
                 New to Hire Skills?
                 <Link
                   to="/signup1"
-                  className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1"
                   replace
+                  className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1"
+                  
                 >
                   Create an account
                 </Link>
@@ -341,23 +365,72 @@ export default function Login() {
     </main>
   );
 }
+import { CheckCircle2, XCircle, AlertTriangle, Info } from "lucide-react";
+
 type AlertProps = {
   message: string;
   isSuccess?: boolean;
+  type?: "success" | "error" | "warning" | "info";
   className?: string;
 };
-const Alert = ({ message, isSuccess = false, className = "" }: AlertProps) => {
+
+export const Alert = ({
+  message,
+  isSuccess,
+  type,
+  className = "",
+}: AlertProps) => {
+  const finalType = isSuccess ? "success" : type || "error";
+
+  const config = {
+    success: {
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      styles: {
+        background: "rgba(34, 197, 94, 0.08)",
+        border: "1px solid rgba(34, 197, 94, 0.25)",
+        color: "#16a34a",
+      },
+    },
+    error: {
+      icon: <XCircle className="w-5 h-5" />,
+      styles: {
+        background: "rgba(239, 68, 68, 0.08)",
+        border: "1px solid rgba(239, 68, 68, 0.25)",
+        color: "#dc2626",
+      },
+    },
+    warning: {
+      icon: <AlertTriangle className="w-5 h-5" />,
+      styles: {
+        background: "rgba(245, 158, 11, 0.08)",
+        border: "1px solid rgba(245, 158, 11, 0.25)",
+        color: "#d97706",
+      },
+    },
+    info: {
+      icon: <Info className="w-5 h-5" />,
+      styles: {
+        background: "rgba(59, 130, 246, 0.08)",
+        border: "1px solid rgba(59, 130, 246, 0.25)",
+        color: "#2563eb",
+      },
+    },
+  };
+
+  const current = config[finalType];
+
   return (
     <div
-      className={`p-3 rounded-lg text-sm font-medium transition-all ${className}`}
+      className={`flex items-start gap-3 px-4 py-3 rounded-xl text-sm font-medium shadow-sm backdrop-blur-md transition-all duration-200 ${className}`}
       style={{
-        margin: 10,
-        color: isSuccess ? "#52c41a" : "#ff4d4f",
-        background: isSuccess ? "rgba(82,196,26,0.08)" : "rgba(255,77,79,0.08)",
-        border: `1px solid ${isSuccess ? "#b7eb8f" : "#ffa39e"}`,
+        background: current.styles.background,
+        border: current.styles.border,
+        color: current.styles.color,
       }}
     >
-      {isSuccess ? "✅ " : "❌ "} {message}
+      <div className="mt-0.5">{current.icon}</div>
+
+      <p className="leading-relaxed flex-1">{message}</p>
     </div>
   );
 };
