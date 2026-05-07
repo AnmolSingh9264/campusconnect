@@ -2,9 +2,10 @@ import { Brain, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import githubIcon from "@/assets/ic_github.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
+import "../../src/css/Login.css";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,10 +15,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
-    const validateForm = () => {
-
+  const validateForm = () => {
     if (!email.trim()) {
       setError("Email is required");
       return false;
@@ -38,50 +38,49 @@ export default function Login() {
       return false;
     }
     return true;
-  }
-
+  };
 
   const handleSignin = async () => {
     try {
-      if(!validateForm()){
+      if (!validateForm()) {
         return;
       }
-      setLoading(true)
-      console.log("signing in started")
+      setLoading(true);
+      console.log("signing in started");
       await signIn(email, password);
-      setLoading(false)
+      setLoading(false);
       console.log("Signin successful");
-      setSuccess("Logged in successfully")
-      navigate('/dashboard')
+      setSuccess("Logged in successfully");
+      navigate("/dashboard");
     } catch (error: any) {
       console.error(error.message);
-      setError(error.message)
-    }finally{
-      setLoading(false)
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-      if (error) {
-        const timer = setTimeout(() => {
-          setError("");
-        }, 3000);
-  
-        return () => clearTimeout(timer);
-      }
-      if (success) {
-        const timer = setTimeout(() => {
-          setSuccess("");
-        }, 3000);
-  
-        return () => clearTimeout(timer);
-      }
-    }, [error, success]);
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error, success]);
 
   return (
     <main className="min-h-screen flex items-stretch font-sans bg-background-custom text-on-background antialiased selection:bg-primary-fixed selection:text-primary">
       {/* Left Side: Branding & Illustration */}
-      <section className="hidden lg:flex lg:w-1/2 relative flex-col justify-center px-16 overflow-hidden bg-primary-container">
+      <section className="hidden lg:flex lg:w-1/2 relative flex-col px-16 overflow-hidden bg-primary-container">
         {/* Background Texture */}
         <div
           className="absolute inset-0 z-0 opacity-20 bg-cover bg-center"
@@ -166,7 +165,7 @@ export default function Login() {
       </section>
 
       {/* Right Side: Login Form */}
-      <section className="flex-1 flex flex-col justify-center px-6 sm:px-12 md:px-24 bg-surface-custom lg:bg-background-custom relative">
+      <section className="flex-1 flex flex-col px-6 sm:px-12 md:px-24 bg-surface-custom lg:bg-background-custom min-h-screen py-12">
         <div className="max-w-md w-full mx-auto space-y-10">
           {/* Mobile Branding */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
@@ -178,7 +177,7 @@ export default function Login() {
 
           <header>
             <h2 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline">
-             {loading ? "Signing In..." : "Sign In"}
+              Sign In
             </h2>
             <p className="mt-2 text-on-surface-variant font-medium">
               Welcome back to the future of hiring.
@@ -302,7 +301,7 @@ export default function Login() {
               type="submit"
               onClick={handleSignin}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
@@ -310,59 +309,55 @@ export default function Login() {
 
           {success && <Alert message={success} isSuccess />}
 
-          <footer className="pt-6 text-center z-10">
-            <p className="text-sm font-medium text-on-surface-variant">
-              New to Hire Skills?
-              <Link
-                to="/signup1"
-                className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1"
-                replace
-              >
-                Create an account
-              </Link>
-            </p>
-          </footer>
+          <div className="max-w-md w-full mx-auto space-y-10 flex flex-col min-h-2">
+            <footer className="mt-auto pt-1 text-center z-10">
+              <p className="text-sm font-medium text-on-surface-variant">
+                New to Hire Skills?
+                <Link
+                  to="/signup1"
+                  className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1"
+                  replace
+                >
+                  Create an account
+                </Link>
+              </p>
+            </footer>
+          </div>
         </div>
 
         {/* Floating Footer Links */}
-        <div className="lg:absolute pointer-events-none bottom-8 left-0 right-0 px-6 sm:px-12 md:px-24 py-8 lg:py-0 flex flex-wrap justify-between gap-4 text-xs font-bold text-outline uppercase tracking-widest backdrop-blur-sm lg:backdrop-blur-none">
-          <div className="flex items-center justify-between w-full">
-            <a className="pointer-events-auto hover:text-primary transition-colors" href="#">
-              Privacy Policy
-            </a>
-            <a className="pointer-events-auto hover:text-primary transition-colors" href="#">
-              Terms of Service
-            </a>
-          </div>
+        <div className="mt-auto pt-10 pb-6 text-xs font-bold text-outline uppercase tracking-widest flex justify-between">
+          <a className="hover:text-primary transition-colors" href="#">
+            Privacy Policy
+          </a>
+
           <p>© 2024 Elite Hiring</p>
+
+          <a className="hover:text-primary transition-colors" href="#">
+            Terms of Service
+          </a>
         </div>
       </section>
     </main>
   );
 }
 type AlertProps = {
-    message: string;
-    isSuccess?: boolean;
-    className?: string;
-  };
-  const Alert = ({
-    message,
-    isSuccess = false,
-    className = "",
-  }: AlertProps) => {
-    return (
-      <div
-        className={`p-3 rounded-lg text-sm font-medium transition-all ${className}`}
-        style={{
-          margin: 10,
-          color: isSuccess ? "#52c41a" : "#ff4d4f",
-          background: isSuccess
-            ? "rgba(82,196,26,0.08)"
-            : "rgba(255,77,79,0.08)",
-          border: `1px solid ${isSuccess ? "#b7eb8f" : "#ffa39e"}`,
-        }}
-      >
-        {isSuccess ? "✅ " : "❌ "} {message}
-      </div>
-    );
-  };
+  message: string;
+  isSuccess?: boolean;
+  className?: string;
+};
+const Alert = ({ message, isSuccess = false, className = "" }: AlertProps) => {
+  return (
+    <div
+      className={`p-3 rounded-lg text-sm font-medium transition-all ${className}`}
+      style={{
+        margin: 10,
+        color: isSuccess ? "#52c41a" : "#ff4d4f",
+        background: isSuccess ? "rgba(82,196,26,0.08)" : "rgba(255,77,79,0.08)",
+        border: `1px solid ${isSuccess ? "#b7eb8f" : "#ffa39e"}`,
+      }}
+    >
+      {isSuccess ? "✅ " : "❌ "} {message}
+    </div>
+  );
+};

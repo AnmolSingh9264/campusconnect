@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Manrope", sans-serif;
+  --font-display: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  --color-primary: #4f378a;
+  --color-primary-container: #6750a4;
+  --color-on-primary: #ffffff;
+  --color-primary-fixed: #e9ddff;
+  --color-primary-fixed-dim: #cfbcff;
+  
+  --color-secondary: #63597c;
+  --color-secondary-container: #e1d4fd;
+  --color-on-secondary-container: #645a7d;
+  
+  --color-tertiary: #765b00;
+  --color-tertiary-container: #c9a74d;
+  
+  --color-background: #fdf7ff;
+  --color-on-background: #1d1b20;
+  
+  --color-surface: #fdf7ff;
+  --color-on-surface: #1d1b20;
+  --color-on-surface-variant: #494551;
+  --color-surface-container: #f2ecf4;
+  --color-surface-container-low: #f8f2fa;
+  --color-surface-container-lowest: #ffffff;
+  
+  --color-outline: #7a7582;
+  --color-outline-variant: #cbc4d2;
+}
+
+@layer utilities {
+  .primary-gradient {
+    background: linear-gradient(135deg, #4f378a 0%, #765b00 100%);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+body {
+  @apply bg-background font-body text-on-background antialiased selection:bg-primary-fixed selection:text-primary;
+}
