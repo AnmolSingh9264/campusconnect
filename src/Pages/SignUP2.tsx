@@ -19,10 +19,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
 //import { useUpdateUser } from "../features/user/userHooks";
 import "../../src/css/SignUp2.css";
+import {
+  useUniversities,
+  useCourses,
+  useBranches,
+} from "../features/signup/signupHooks.ts";
 
 export default function SignUP2() {
   const navigate = useNavigate();
- // const { user } = useAuth();
+  // const { user } = useAuth();
   const [university, setUniversity] = useState("");
   const [course, setCourse] = useState("");
   const [branch, setBranch] = useState("");
@@ -37,9 +42,23 @@ export default function SignUP2() {
   const [fullname, setFullName] = useState("");
   const [isTermsAccepted, setTermsAccepted] = useState(false);
 
- // const { mutateAsync } = useUpdateUser();
+  const { universities } = useUniversities();
 
-/*const saveUser = async () => {
+  const { courses } = useCourses(university);
+
+  const { branches } = useBranches(university, course);
+
+  const selectedCourse = courses.find((c) => c.id === Number(course));
+  const yearOptions = selectedCourse
+    ? Array.from({ length: selectedCourse.duration }, (_, i) => ({
+        value: String(i + 1),
+        label: `${i + 1}${i === 0 ? "st" : i === 1 ? "nd" : i === 2 ? "rd" : "th"} Year`,
+      }))
+    : [];
+
+  // const { mutateAsync } = useUpdateUser();
+
+  /*const saveUser = async () => {
 
   if (!validateForm()) return;
 
@@ -98,12 +117,12 @@ export default function SignUP2() {
       return false;
     }
 
-    if(!gender.trim()){
-        setError("Gender is required")
-        return false;
+    if (!gender.trim()) {
+      setError("Gender is required");
+      return false;
     }
 
-   if (!university.trim()) {
+    if (!university.trim()) {
       setError("University is required");
       return false;
     }
@@ -133,19 +152,27 @@ export default function SignUP2() {
   };
 
   const handleSignup = async () => {
-    if(!validateForm()){
-        return;
+    if (!validateForm()) {
+      return;
     }
     setLoading(true);
     try {
-      await signUp(email, password, fullname, gender, university, course, branch, year);
+      await signUp(
+        email,
+        password,
+        fullname,
+        gender,
+        university,
+        course,
+        branch,
+        year,
+      );
       console.log("SignUp successful");
-      navigate("/signup3",{
-        state:{
-            useremail:email
-        }
-      })
-      
+      navigate("/signup3", {
+        state: {
+          useremail: email,
+        },
+      });
     } catch (error: any) {
       console.error(error.message);
       setError(error.message || "Something went wrong");
@@ -302,11 +329,11 @@ export default function SignUP2() {
                   type="text"
                   placeholder="John Doe"
                   value={fullname}
-                  onChange={(e)=> setFullName(e.target.value)}
+                  onChange={(e) => setFullName(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-white border border-outline-variant rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none text-sm font-medium placeholder:text-outline-variant/60"
                 />
               </div>
-            </div> 
+            </div>
 
             <div className="space-y-1.5">
               <label
@@ -391,36 +418,34 @@ export default function SignUP2() {
               </div>
             </div>
 
-             <div className="space-y-1.5">
-                <label
-                  className="block text-xs font-bold text-on-surface-variant px-1"
-                  htmlFor="gender"
+            <div className="space-y-1.5">
+              <label
+                className="block text-xs font-bold text-on-surface-variant px-1"
+                htmlFor="gender"
+              >
+                GENDER
+              </label>
+              <div className="relative group">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline group-focus-within:text-primary transition-colors" />
+                <select
+                  id="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full pl-11 pr-10 py-3 bg-white border border-outline-variant rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none text-sm font-medium appearance-none cursor-pointer"
                 >
-                  GENDER
-                </label>
-                <div className="relative group">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline group-focus-within:text-primary transition-colors" />
-                  <select
-                    id="gender"
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="w-full pl-11 pr-10 py-3 bg-white border border-outline-variant rounded-xl focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all outline-none text-sm font-medium appearance-none cursor-pointer"
-                  >
-                    <option value="" disabled>
-                      Select Gender
-                    </option>
-                    <option value="male">
-                      Male
-                    </option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
-                </div>
-              </div> 
+                  <option value="" disabled>
+                    Select Gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
+              </div>
+            </div>
 
             {/* University Details */}
-           <div className="space-y-4 pt-2">
+            <div className="space-y-4 pt-2">
               <div className="space-y-1.5">
                 <label
                   className="block text-xs font-bold text-on-surface-variant px-1"
@@ -439,15 +464,15 @@ export default function SignUP2() {
                     <option value="" disabled>
                       Select University
                     </option>
-                    <option value="mit">
-                      Massachusetts Institute of Technology
-                    </option>
-                    <option value="stanford">Stanford University</option>
-                    <option value="cmv">Carnegie Mellon University</option>
+                    {universities.map((uni) => (
+                      <option key={uni.id} value={uni.id}>
+                        {uni.name}
+                      </option>
+                    ))}
                   </select>
                   <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
                 </div>
-              </div> 
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -468,9 +493,11 @@ export default function SignUP2() {
                       <option value="" disabled>
                         Select Course
                       </option>
-                      <option value="btech">B.Tech / B.E.</option>
-                      <option value="mtech">M.Tech</option>
-                      <option value="bsc">B.Sc Computer Science</option>
+                      {courses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.name}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
                   </div>
@@ -494,9 +521,11 @@ export default function SignUP2() {
                       <option value="" disabled>
                         Select Branch
                       </option>
-                      <option value="cs">Computer Science</option>
-                      <option value="it">Information Technology</option>
-                      <option value="ece">Electronics & Communication</option>
+                      {branches.map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
                   </div>
@@ -521,11 +550,13 @@ export default function SignUP2() {
                     <option value="" disabled>
                       Select Graduation Year
                     </option>
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                    <option value="p">PassOut</option>
+                    {yearOptions.map((year) => (
+                      <option key={year.value} value={year.value}>
+                        {year.label}
+                      </option>
+                    ))}
+
+                    <option value="passout">PassOut</option>
                   </select>
                   <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
                 </div>
@@ -538,7 +569,7 @@ export default function SignUP2() {
                   type="checkbox"
                   id="terms"
                   checked={isTermsAccepted}
-                  onChange={(e)=> setTermsAccepted(e.target.checked)}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
                   className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer accent-primary"
                 />
               </div>

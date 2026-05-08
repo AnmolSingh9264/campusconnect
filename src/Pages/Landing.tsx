@@ -71,6 +71,7 @@ const Navbar = () => {
 };
 
 const Hero = () => {
+   const navigate = useNavigate();
   return (
     <section className="relative px-8 pt-20 pb-32 overflow-hidden max-w-7xl mx-auto">
       <div className="absolute top-0 right-0 -z-10 w-1/2 h-full opacity-20 pointer-events-none">
@@ -95,7 +96,7 @@ const Hero = () => {
             The world's first predictive hiring platform that uses real-world challenges to measure candidate potential. Forget the PDF—hire based on what people can actually build.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="primary-gradient text-white px-8 py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center gap-2">
+            <button onClick={()=> navigate("/signup1")} className="primary-gradient text-white px-8 py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center gap-2">
               Get Started 
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -405,6 +406,7 @@ const Testimonials = () => {
 };
 
 const CTA = () => {
+   const navigate = useNavigate();
   return (
     <section className="px-8 pb-24 max-w-7xl mx-auto">
       <div className="primary-gradient rounded-[3rem] p-12 lg:p-20 text-center text-white relative overflow-hidden">
@@ -424,7 +426,7 @@ const CTA = () => {
             Join 5,000+ forward-thinking companies already hiring based on actual capability.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-white text-primary px-10 py-4 rounded-xl font-bold shadow-xl active:scale-95 transition-transform">
+            <button onClick={()=> navigate("/signup1")} className="bg-white text-primary px-10 py-4 rounded-xl font-bold shadow-xl active:scale-95 transition-transform">
               Create Your Account
             </button>
             <button className="bg-white/10 border border-white/20 text-white px-10 py-4 rounded-xl font-bold backdrop-blur-md hover:bg-white/20 transition-all">

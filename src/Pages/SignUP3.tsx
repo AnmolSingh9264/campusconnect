@@ -242,6 +242,8 @@ export default function SignUP3() {
             </div>
           </motion.div>
 
+           {error||success ? <div style={{ padding: "20px" }}></div> : <div></div>}
+
           {error && <Alert message={error} />}
 
           {success && <Alert message={success} isSuccess />}
