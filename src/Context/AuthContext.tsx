@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 const sendResetLink = async (email: string) => {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://localhost:5173/updatepassword",
+    redirectTo: "https://campusconnect-two-omega.vercel.app/updatepassword",
   });
 
   if (error) {
