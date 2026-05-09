@@ -129,7 +129,7 @@ const updatePassword = async (password: string) => {
       email,
       password,
       options: {
-        emailRedirectTo:"http://localhost:5173/login",
+        emailRedirectTo:"https://campusconnect-two-omega.vercel.app/login",
         data: {
           full_name: fullname,
           gender,
