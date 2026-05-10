@@ -10,6 +10,7 @@ type AuthContextType = {
   resendEmail: (email: string) => Promise<void>;
   sendResetLink: (email: string) => Promise<void>;
   updatePassword:(password: string) => Promise<void>;
+  signInWithGoogle:() => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     email: string,
@@ -55,6 +56,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     if (error) throw error;
   };
+
+   const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    })
+
+    if (error) {
+      console.error(error.message)
+    }
+  }
 
   const checkIsVerified = async (): Promise<boolean> => {
    const { data, error } = await supabase.auth.getUser();
@@ -150,7 +161,7 @@ const updatePassword = async (password: string) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut, resendEmail, checkIsVerified, sendResetLink, updatePassword}}
+      value={{ user, session, loading, signIn, signUp, signOut, resendEmail, checkIsVerified, sendResetLink, updatePassword, signInWithGoogle}}
     >
       {children}
     </AuthContext.Provider>

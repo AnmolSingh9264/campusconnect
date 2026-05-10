@@ -1,11 +1,13 @@
 import { Bell, Settings, Menu } from 'lucide-react';
 import { useAuth } from '../Context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface TopNavProps {
   onOpenMenu: () => void;
 }
 
 export default function TopNav({ onOpenMenu }: TopNavProps) {
+  const navigate= useNavigate();
    const { user } = useAuth();
   return (
     <header className="flex items-center justify-between mb-8">
@@ -30,6 +32,7 @@ export default function TopNav({ onOpenMenu }: TopNavProps) {
           </button>
           <div className="h-8 w-px bg-slate-200 mx-1"></div>
           <img
+          onClick={()=>navigate('/editprofile')}
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfpWLHHvrpF01kbUIpm-Atk9f71IUyzGHw8J2ejqnAKwjIrRZhK02RodpfvnwShi6BPEg2K6MRdRhCwf-nXkyPz7CUaC8IK_YgNKuDSlO7l8gSD18V4Tk41bZiaM1XgDcqZovElZ6jWPqEaUKyIyINcwXPD-vqhM4nUUshQ1pbl3qbciS9y5Pbfjyl73Ec5p8Vg8QbDcKyHFCdp4OAqKetwt-5dMEgfm-oHdON1c-WmgMYFecongQinKn4T9AbQId_ethvqbvsiiQ"
             alt="User Profile Avatar"
             className="w-8 h-8 rounded-full object-cover"

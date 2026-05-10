@@ -9,13 +9,14 @@ import Dashboard from "./Pages/Dashboard";
 import UpdatePassword from "./Pages/UpdatePassword.tsx";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
+import EditProfile from "./Pages/EditProfile.tsx";
 
 export default function App() {
   return (
     <Routes>
       {/* open landing page */}
       <Route path="/" element={<Landing />} />
-      
+
       <Route path="/updatepassword" element={<UpdatePassword/>}/>
 
       <Route element={<GuestGuard />}>
@@ -27,6 +28,7 @@ export default function App() {
 
       <Route element={<CheckAuth />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/editprofile" element={<EditProfile/>} />
       </Route>
     </Routes>
   );

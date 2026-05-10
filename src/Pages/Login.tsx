@@ -10,7 +10,7 @@ import "../../src/css/Login.css";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { signIn, sendResetLink } = useAuth();
+  const { signIn, sendResetLink, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState("");
@@ -58,6 +58,22 @@ export default function Login() {
       setError(error.message);
     } finally {
       setResetting(false);
+    }
+  };
+  const handleGoogleSignin = async () => {
+    try {
+      setLoading(true);
+      console.log("google signing in started");
+      await signInWithGoogle();
+      setLoading(false);
+      console.log("Signin successful");
+      setSuccess("Logged in successfully");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error(error.message);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -207,7 +223,7 @@ export default function Login() {
 
           {/* Social Login */}
           <div className="space-y-4">
-            <button className="w-full flex items-center justify-center gap-3 px-6 py-3 border border-outline-variant bg-surface-container-lowest rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container hover:border-outline transition-all duration-200 active:scale-[0.98]">
+            <button onClick={handleGoogleSignin} className="w-full flex items-center justify-center gap-3 px-6 py-3 border border-outline-variant bg-surface-container-lowest rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container hover:border-outline transition-all duration-200 active:scale-[0.98]">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

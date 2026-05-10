@@ -12,6 +12,7 @@ import RecentActivity from '../components/RecentActivity';
 import BestMatches from '../components/BestMatches';
 import { useAuth } from "../../src/Context/AuthContext.tsx";
 
+
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const { signOut } = useAuth();
