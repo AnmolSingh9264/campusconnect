@@ -57,12 +57,12 @@ export const useBranches = (
   const [branches, setBranches] = useState<Branch[]>([]);
 
   useEffect(() => {
-    if (!universityId || !courseId) return;
+    if (!courseId) return;
 
     const fetchBranches = async () => {
       try {
         const data = await academicService.getBranches(
-          universityId,
+          courseId,
         );
 
         setBranches(data);
@@ -72,7 +72,7 @@ export const useBranches = (
     };
 
     fetchBranches();
-  }, [universityId, courseId]);
+  }, [ courseId]);
 
   return { branches };
 };
