@@ -46,7 +46,7 @@ export default function SignUP2() {
 
   const { courses } = useCourses(university);
 
-  const { branches } = useBranches(university, course);
+  const { branches } = useBranches(course);
 
   const selectedCourse = courses.find((c) => c.id === Number(course));
   const yearOptions = selectedCourse
