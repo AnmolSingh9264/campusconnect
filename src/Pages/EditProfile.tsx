@@ -52,7 +52,7 @@ import { motion, AnimatePresence } from "motion/react";
 // --- Types ---
 type OnboardingStep = 1 | 2 | 3 | 4;
 
-interface BasicInfo {
+/*interface BasicInfo {
   fullName: string;
   email: string;
   gender: string;
@@ -60,29 +60,29 @@ interface BasicInfo {
   course: string;
   branch: string;
   graduationYear: string;
-}
+}*/
 
-interface ProjectInfo {
+/*interface ProjectInfo {
   title: string;
   description: string;
   githubLink: string;
   technologies: string[];
   liveUrl: string;
   thumbnail: string | null;
-}
+}*/
 
-interface CareerGoals {
+/*interface CareerGoals {
   roles: string[];
   environment: "remote" | "hybrid" | "onsite";
   salaryRange: [number, number];
   vision: string;
-}
+}*/
 
-interface SoftSkills {
+/*interface SoftSkills {
   skills: string[];
   industries: string[];
   teamSize: number;
-}
+}*/
 
 export default function EditProfile() {
 
