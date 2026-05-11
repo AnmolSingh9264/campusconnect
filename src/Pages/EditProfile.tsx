@@ -45,7 +45,6 @@ import {
   useUniversities,
   useCourses,
   useBranches,
-  UniversityById,
 } from "../features/signup/signupHooks.ts";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
 import { motion, AnimatePresence } from "motion/react";
