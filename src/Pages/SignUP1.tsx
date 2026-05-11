@@ -12,7 +12,7 @@ type Role = "candidate" | "recruiter";
 
 export default function SignUP1() {
   const navigate = useNavigate();
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, signInWithGithub } = useAuth();
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -32,6 +32,19 @@ export default function SignUP1() {
       return () => clearTimeout(timer);
     }
   }, [error, success]);
+
+   const handleGithubSignin = async () => {
+    try {
+      console.log("github signing in started");
+      await signInWithGithub();
+      console.log("Signin successful");
+      setSuccess("Logged in successfully");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error(error.message);
+      setError(error.message);
+    }
+  };
 
   const handleGoogleSignin = async () => {
     try {
@@ -291,7 +304,7 @@ export default function SignUP1() {
                 </svg>
                 Google
               </button>
-              <button className="flex items-center justify-center gap-2 h-12 rounded-xl border border-brand-outline-variant bg-white text-sm font-bold text-brand-on-surface-variant hover:bg-brand-surface transition-all active:scale-[0.98]">
+              <button onClick={handleGithubSignin} className="flex items-center justify-center gap-2 h-12 rounded-xl border border-brand-outline-variant bg-white text-sm font-bold text-brand-on-surface-variant hover:bg-brand-surface transition-all active:scale-[0.98]">
                 <img src={githubIcon} className="w-5 h-5" alt="GitHub" />
                 GitHub
               </button>

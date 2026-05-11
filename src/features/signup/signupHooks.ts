@@ -29,6 +29,33 @@ export const useUniversities = () => {
   };
 };
 
+export const UniversityById = (id:string) => {
+  const [universityById, setUniversity] = useState<University | null>();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      setLoading(true);
+
+      try {
+        const data = await academicService.getUniversityById(id);
+        setUniversity(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUniversities();
+  }, []);
+
+  return {
+    universityById,
+    loading,
+  };
+};
+
 export const useCourses = (universityId: string) => {
   const [courses, setCourses] = useState<Course[]>([]);
 

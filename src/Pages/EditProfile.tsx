@@ -45,6 +45,7 @@ import {
   useUniversities,
   useCourses,
   useBranches,
+  UniversityById,
 } from "../features/signup/signupHooks.ts";
 import { useAuth } from "../../src/Context/AuthContext.tsx";
 import { motion, AnimatePresence } from "motion/react";
@@ -373,6 +374,13 @@ useEffect(() => {
   setFullName(user.user_metadata.full_name || "");
   setEmail(user.email || "");
   setGender(user.user_metadata.gender || "");
+  setUniversity(user.user_metadata.university || "");
+  setBranch(user.user_metadata.branch || "")
+  setCourse(user.user_metadata.course || "")
+  setYear(user.user_metadata.year || "")
+ //  const { universityById } = UniversityById(user.user_metadata.university || "");
+  //console.log(universityById)
+  //setUniversity(universityById[0].name)
 
   //setUniversity(user.university?.toString() || "");
   //setCourse(user.course?.toString() || "");

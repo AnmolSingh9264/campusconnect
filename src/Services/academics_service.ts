@@ -17,6 +17,18 @@ export const academicService = {
     return data;
   },
 
+   async getUniversityById(id:string): Promise<University | null> {
+    const { data, error } = await supabase
+      .from("universities")
+      .select("id, name")
+      .eq("id",Number(id))
+      .single()
+
+    if (error) throw error;
+
+    return data;
+  },
+
   async getCourses(universityId: string): Promise<Course[]> {
     const { data, error } = await supabase
       .from("university_courses")

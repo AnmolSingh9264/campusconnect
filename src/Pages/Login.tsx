@@ -10,7 +10,7 @@ import "../../src/css/Login.css";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { signIn, sendResetLink, signInWithGoogle } = useAuth();
+  const { signIn, sendResetLink, signInWithGoogle, signInWithGithub } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState("");
@@ -58,6 +58,22 @@ export default function Login() {
       setError(error.message);
     } finally {
       setResetting(false);
+    }
+  };
+  const handleGithubSignin = async () => {
+    try {
+      setLoading(true);
+      console.log("github signing in started");
+      await signInWithGithub();
+      setLoading(false);
+      console.log("Signin successful");
+      setSuccess("Logged in successfully");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error(error.message);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
   const handleGoogleSignin = async () => {
@@ -244,7 +260,7 @@ export default function Login() {
               </svg>
               Continue with Google
             </button>
-            <button className="w-full flex items-center justify-center gap-3 px-6 py-3 border border-outline-variant bg-surface-container-lowest rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container hover:border-outline transition-all duration-200 active:scale-[0.98]">
+            <button onClick={handleGithubSignin} className="w-full flex items-center justify-center gap-3 px-6 py-3 border border-outline-variant bg-surface-container-lowest rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container hover:border-outline transition-all duration-200 active:scale-[0.98]">
               <img src={githubIcon} className="w-5 h-5" alt="GitHub" />
               Continue with GitHub
             </button>
