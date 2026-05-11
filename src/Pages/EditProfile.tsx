@@ -355,7 +355,7 @@ function BasicInformation({ onNext }: { onNext: () => void }) {
 
   const { courses } = useCourses(university);
 
-  const { branches } = useBranches(university, course);
+  const { branches } = useBranches(course);
 
   const selectedCourse = courses.find((c) => c.id === Number(course));
   const yearOptions = selectedCourse
@@ -557,7 +557,7 @@ function FeaturedProject({
   onNext: () => void;
   onPrev: () => void;
 }) {
-  const [tags, setTags] = useState(["React.js", "TypeScript", "Tailwind CSS"]);
+  const [tags] = useState(["React.js", "TypeScript", "Tailwind CSS"]);
 
   return (
     <div className="max-w-5xl mx-auto">

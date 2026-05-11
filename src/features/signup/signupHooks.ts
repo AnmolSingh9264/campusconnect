@@ -51,7 +51,6 @@ export const useCourses = (universityId: string) => {
 };
 
 export const useBranches = (
-  universityId: string,
   courseId: string
 ) => {
   const [branches, setBranches] = useState<Branch[]>([]);
