@@ -85,24 +85,8 @@ interface SoftSkills {
 }
 
 export default function EditProfile() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [fullname, setFullName] = useState("");
-  const [isTermsAccepted, setTermsAccepted] = useState(false);
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
-  const [basicInfo, setBasicInfo] = useState<BasicInfo>({
-    fullName: "",
-    email: "",
-    gender: "",
-    university: "",
-    course: "",
-    branch: "",
-    graduationYear: "",
-  });
 
   const nextStep = () =>
     setCurrentStep((prev) => Math.min(prev + 1, 4) as OnboardingStep);
