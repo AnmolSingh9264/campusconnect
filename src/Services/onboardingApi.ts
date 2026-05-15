@@ -1,6 +1,6 @@
 import { supabase } from "../../src/Supabase/Client";
 
-  const toDbProject = (project: any, userId?: string) => ({
+ /* const toDbProject = (project: any, userId?: string) => ({
       ...(userId && { user_id: userId }),
 
       title: project.title,
@@ -12,7 +12,7 @@ import { supabase } from "../../src/Supabase/Client";
       technologies: project.technologies,
 
       is_primary: project.isPrimary,
-    });
+    });*/
     const fromDbProject = (project: any) => ({
       id: project.id,
 
