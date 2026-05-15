@@ -10,6 +10,7 @@ import UpdatePassword from "./Pages/UpdatePassword.tsx";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./Context/AuthContext.tsx";
 import EditProfile from "./Pages/EditProfile.tsx";
+import { OnboardingProvider } from "./Context/OnboardingContext.tsx";
 
 export default function App() {
   return (
@@ -17,7 +18,7 @@ export default function App() {
       {/* open landing page */}
       <Route path="/" element={<Landing />} />
 
-      <Route path="/updatepassword" element={<UpdatePassword/>}/>
+      <Route path="/updatepassword" element={<UpdatePassword />} />
 
       <Route element={<GuestGuard />}>
         <Route path="/login" element={<Login />} />
@@ -28,7 +29,15 @@ export default function App() {
 
       <Route element={<CheckAuth />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/editprofile" element={<EditProfile/>} />
+
+        <Route
+          path="/editprofile"
+          element={
+            <OnboardingProvider>
+              <EditProfile />
+            </OnboardingProvider>
+          }
+        />
       </Route>
     </Routes>
   );

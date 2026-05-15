@@ -1,7 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 import "../../src/css/EditProfile.css";
 import React, { useState, useEffect } from "react";
 import {
@@ -20,12 +16,14 @@ import {
   Book,
   Calendar,
   Layers,
-  Link,
   ChevronDown,
   X,
   Plus,
-  Rocket as RocketIcon,
-  Info,
+  PlusCircle,
+  Link as LinkIcon,
+  Edit2,
+  Trash2,
+  Lightbulb,
   Briefcase,
   Globe,
   Building2,
@@ -33,7 +31,6 @@ import {
   Zap,
   Users,
   Target as TargetIcon,
-  Upload,
   CreditCard,
   Stethoscope,
   TreePine,
@@ -46,11 +43,20 @@ import {
   useCourses,
   useBranches,
 } from "../features/signup/signupHooks.ts";
-import { useAuth } from "../../src/Context/AuthContext.tsx";
+import { useOnboarding } from "../Context/OnboardingContext.tsx";
+//import { useAuth } from "../../src/Context/AuthContext.tsx";
 import { motion, AnimatePresence } from "motion/react";
+import Toast, { type AlertType } from "../components/Toast.tsx";
 
-// --- Types ---
-type OnboardingStep = 1 | 2 | 3 | 4;
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  githubUrl: string;
+  liveUrl?: string;
+  technologies: string[];
+  isPrimary?: boolean;
+}
 
 /*interface BasicInfo {
   fullName: string;
@@ -85,20 +91,27 @@ type OnboardingStep = 1 | 2 | 3 | 4;
 }*/
 
 export default function EditProfile() {
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    goToStep,
+    progress,
+  } = useOnboarding();
 
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
+  /* const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
 
   const nextStep = () =>
     setCurrentStep((prev) => Math.min(prev + 1, 4) as OnboardingStep);
   const prevStep = () =>
-    setCurrentStep((prev) => Math.max(prev - 1, 1) as OnboardingStep);
+    setCurrentStep((prev) => Math.max(prev - 1, 1) as OnboardingStep);*/
 
-  const progressMap = {
+  /*const progressMap = {
     1: 25,
     2: 45,
     3: 75,
     4: 100,
-  };
+  };*/
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
@@ -130,7 +143,7 @@ export default function EditProfile() {
                     ? "Completed"
                     : "Upcoming"
               }
-              onClick={() => setCurrentStep(1)}
+              onClick={() => goToStep(1)}
             />
             <SidebarStep
               icon={<Rocket className="w-5 h-5" />}
@@ -144,7 +157,7 @@ export default function EditProfile() {
                     ? "Completed"
                     : "Upcoming"
               }
-              onClick={() => currentStep >= 2 && setCurrentStep(2)}
+              onClick={() => currentStep >= 2 && goToStep(2)}
             />
             <SidebarStep
               icon={<Target className="w-5 h-5" />}
@@ -158,7 +171,7 @@ export default function EditProfile() {
                     ? "Completed"
                     : "Next Step"
               }
-              onClick={() => currentStep >= 3 && setCurrentStep(3)}
+              onClick={() => currentStep >= 3 && goToStep(3)}
             />
             <SidebarStep
               icon={<BrainCircuit className="w-5 h-5" />}
@@ -166,7 +179,7 @@ export default function EditProfile() {
               active={currentStep === 4}
               completed={currentStep > 4}
               status={currentStep === 4 ? "Personalizing" : "Final Step"}
-              onClick={() => currentStep >= 4 && setCurrentStep(4)}
+              onClick={() => currentStep >= 4 && goToStep(4)}
             />
           </div>
         </nav>
@@ -192,13 +205,13 @@ export default function EditProfile() {
                 Progress
               </span>
               <span className="text-[10px] font-bold text-primary">
-                {progressMap[currentStep]}%
+                {progress}%
               </span>
             </div>
             <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className="h-full primary-gradient transition-all duration-500 ease-out shadow-[0_0_8px_rgba(79,55,138,0.3)]"
-                style={{ width: `${progressMap[currentStep]}%` }}
+                style={{ width: `${progress}%` }}
               />
             </div>
           </div>
@@ -341,10 +354,19 @@ function SidebarStep({
 }
 
 function BasicInformation({ onNext }: { onNext: () => void }) {
-     const { user } = useAuth();
-    const [fullname, setFullName] = useState("");
-      const [email, setEmail] = useState("");
-      
+  const { currentStep, nextStep, onboardingData, updateData } = useOnboarding();
+
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
+
+  //const { user, updateUser } = useAuth();
+
+  const [fullname, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [university, setUniversity] = useState("");
   const [course, setCourse] = useState("");
   const [branch, setBranch] = useState("");
@@ -365,30 +387,185 @@ function BasicInformation({ onNext }: { onNext: () => void }) {
       }))
     : [];
 
-    // assigning data into ui
+  const fetchBasicInfo = async () => {
+    try {
+      if (!onboardingData.basicInfo) return;
 
-useEffect(() => {
-  if (!user) return;
+      // local onboarding data
+      if (onboardingData.basicInfo) {
+        const data = onboardingData.basicInfo;
 
-  setFullName(user.user_metadata.full_name || "");
-  setEmail(user.email || "");
-  setGender(user.user_metadata.gender || "");
-  setUniversity(user.user_metadata.university || "");
-  setBranch(user.user_metadata.branch || "")
-  setCourse(user.user_metadata.course || "")
-  setYear(user.user_metadata.year || "")
- //  const { universityById } = UniversityById(user.user_metadata.university || "");
-  //console.log(universityById)
-  //setUniversity(universityById[0].name)
+        setFullName(data.fullName || "");
+        setEmail(data.email || "");
+        setGender(data.gender || "");
+        setUniversity(data.university || "");
+        setCourse(data.course || "");
+        setBranch(data.branch || "");
+        setYear(data.year || "");
 
-  //setUniversity(user.university?.toString() || "");
-  //setCourse(user.course?.toString() || "");
-  //setBranch(user.branch?.toString() || "");
-  //setYear(user.year?.toString() || "");
-}, [user]);
-    
+        return;
+      }
+
+      // local draft fallback
+      const savedDraft = localStorage.getItem("basicInfo");
+
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+
+        setFullName(parsed.fullname || "");
+        setEmail(parsed.email || "");
+        setUniversity(parsed.university || "");
+        setCourse(parsed.course || "");
+        setBranch(parsed.branch || "");
+        setYear(parsed.year || "");
+        setGender(parsed.gender || "");
+
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (currentStep !== 1) return;
+
+    fetchBasicInfo();
+  }, [currentStep, onboardingData.basicInfo]);
+
+  const validateForm = () => {
+    if (!fullname.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please enter your full name",
+      });
+      return false;
+    }
+
+    if (!gender.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please select your gender",
+      });
+      return false;
+    }
+
+    if (!university.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please select your university",
+      });
+      return false;
+    }
+
+    if (!course.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please select your course",
+      });
+      return false;
+    }
+
+    if (!branch.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please select your batch",
+      });
+      return false;
+    }
+
+    if (!year.trim()) {
+      setAlert({
+        type: "error",
+        message: "Please select your year",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const SaveDetails = async () => {
+    try {
+      if (!validateForm()) {
+        return false;
+      }
+      setLoading(true);
+      updateData("basicInfo", {
+        fullname,
+        email,
+        gender,
+        university,
+        course,
+        branch,
+        year,
+        progress: 50,
+      });
+      setLoading(false);
+      console.log("basic details saved successfully");
+      localStorage.removeItem("basicInfo");
+      setAlert({
+        type: "success",
+        message: "Details updated successfully",
+      });
+      //onNext();
+      await nextStep();
+    } catch (error: any) {
+      console.error(error.message);
+      setAlert({
+        type: "error",
+        message: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveDraft = () => {
+    const draftData = {
+      fullname,
+      email,
+      university,
+      course,
+      branch,
+      year,
+      gender,
+    };
+
+    localStorage.setItem("basicInfo", JSON.stringify(draftData));
+
+    setAlert({
+      type: "success",
+      message: "Information saved into draft",
+    });
+  };
+
+  // assigning data into ui
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("basicInfo");
+
+    if (savedDraft) {
+      const parsed = JSON.parse(savedDraft);
+
+      setFullName(parsed.fullname || "");
+      setEmail(parsed.email || "");
+      setUniversity(parsed.university || "");
+      setCourse(parsed.course || "");
+      setBranch(parsed.branch || "");
+      setYear(parsed.year || "");
+      setGender(parsed.gender || "");
+    }
+  }, [onboardingData.basicInfo]);
+
   return (
     <div className="max-w-3xl mx-auto">
+      {alert && (
+        <Toast
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <header className="mb-10">
         <span className="inline-block py-1.5 px-3.5 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold uppercase tracking-wider mb-4 border border-indigo-200">
           Step 1 of 4
@@ -407,7 +584,6 @@ useEffect(() => {
           className="space-y-8"
           onSubmit={(e) => {
             e.preventDefault();
-            onNext();
           }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
@@ -424,6 +600,7 @@ useEffect(() => {
               placeholder="john.doe@example.com"
               type="email"
               value={email}
+              disabled={true}
               onChange={setEmail}
             />
             <SelectField
@@ -528,6 +705,7 @@ useEffect(() => {
 
           <div className="pt-6 flex justify-end items-center gap-6 border-t border-slate-100">
             <button
+              onClick={saveDraft}
               type="button"
               className="text-sm font-bold text-slate-500 hover:text-primary transition-colors px-4 py-2"
             >
@@ -535,9 +713,10 @@ useEffect(() => {
             </button>
             <button
               type="submit"
+              onClick={SaveDetails}
               className="primary-gradient px-12 py-3.5 rounded-2xl text-white font-bold text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 group"
             >
-              Next Step
+              {loading ? "Saving..." : "Next Step"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -558,6 +737,619 @@ useEffect(() => {
 }
 
 function FeaturedProject({
+  onNext,
+  onPrev,
+}: {
+  onNext: () => void;
+  onPrev: () => void;
+}) {
+  /* const [projects, setProjects] = useState<Project[]>([
+    {
+      id: "1",
+      title: "Distributed Ledger for FinTech",
+      description:
+        "Built a high-performance distributed ledger system capable of processing 10k+ transactions per second. Reduced settlement latency by 60% using optimized consensus algorithms and WebSocket-based real-time updates.",
+      githubUrl: "github.com/alexdev/fintech-ledger",
+      liveUrl: "Live Demo",
+      technologies: ["React.js", "TypeScript", "Tailwind CSS", "Node.js"],
+      isPrimary: true,
+    },
+    {
+      id: "2",
+      title: "AI Image Optimization Suite",
+      description:
+        "Developed a serverless image processing pipeline that uses ML models to automatically resize and optimize assets. Implemented lazy loading and edge caching strategy resulting in 40% faster page loads for e-commerce clients.",
+      githubUrl: "github.com/alexdev/ai-optimizer",
+      technologies: ["Python", "AWS Lambda", "Next.js"],
+    },
+  ]);*/
+  const { onboardingData, updateData, deleteProject, updateProject, insertProject } =
+    useOnboarding();
+ const projects:Project[] = (onboardingData.projectInfo || []).filter(Boolean);
+  const [deleting, setDeleting] = useState(false);
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [newProject, setNewProject] = useState<Partial<Project>>({
+    title: "",
+    description: "",
+    githubUrl: "",
+    liveUrl: "",
+    technologies: [],
+  });
+  const [techInput, setTechInput] = useState("");
+
+  const editProject = (project: Project) => {
+    setEditingProjectId(project.id);
+
+    setNewProject({
+      title: project.title,
+      description: project.description,
+      githubUrl: project.githubUrl,
+      liveUrl: project.liveUrl,
+      technologies: project.technologies,
+    });
+
+    setIsAdding(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      if (!editingProjectId) return;
+
+      setDeleting(true);
+
+      const updatedProject: Project = {
+        id: editingProjectId,
+
+        title: newProject.title || "",
+
+        description: newProject.description || "",
+
+        githubUrl: newProject.githubUrl || "",
+
+        liveUrl: newProject.liveUrl || "",
+
+        technologies: newProject.technologies || [],
+
+        isPrimary: false,
+      };
+
+      // --------------------------------
+      // UPDATE IN DATABASE
+      // --------------------------------
+
+      await updateProject(editingProjectId, updatedProject);
+
+      // --------------------------------
+      // UPDATE LOCAL UI
+      // --------------------------------
+
+      const updatedProjects = projects.map((project) =>
+        project.id === editingProjectId ? updatedProject : project,
+      );
+
+      updateData("projectInfo", updatedProjects);
+
+      // --------------------------------
+      // RESET FORM
+      // --------------------------------
+
+      setEditingProjectId(null);
+
+      setIsAdding(false);
+
+      setNewProject({
+        title: "",
+        description: "",
+        githubUrl: "",
+        liveUrl: "",
+        technologies: [],
+      });
+
+      setTechInput("");
+
+      // --------------------------------
+      // SUCCESS
+      // --------------------------------
+
+      setAlert({
+        type: "success",
+        message: "Project updated successfully",
+      });
+    } catch (error: any) {
+      console.error(error.message);
+
+      setAlert({
+        type: "error",
+        message: error.message ?? "Error updating project",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeleting(true);
+
+      await deleteProject(id);
+
+      console.log("Project deleted successfully");
+
+      setAlert({
+        type: "success",
+        message: "Project deleted successfully",
+      });
+    } catch (error: any) {
+      console.error(error.message);
+
+      setAlert({
+        type: "error",
+        message: error.message ?? "Error while deleting project",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleAddTech = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && techInput.trim()) {
+      e.preventDefault();
+      setNewProject((prev) => ({
+        ...prev,
+        technologies: [...(prev.technologies || []), techInput.trim()],
+      }));
+      setTechInput("");
+    }
+  };
+
+  const removeTech = (tech: string) => {
+    setNewProject((prev) => ({
+      ...prev,
+      technologies: (prev.technologies || []).filter((t) => t !== tech),
+    }));
+  };
+
+  const saveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newProject.title || !newProject.description) return;
+
+    // -----------------------------
+    // EDIT EXISTING PROJECT
+    // -----------------------------
+    /* if (editingProjectId) {
+      const updatedProjects = projects.map((project) =>
+        project.id === editingProjectId
+          ? {
+              ...project,
+              title: newProject.title || "",
+              description: newProject.description || "",
+              githubUrl: newProject.githubUrl || "",
+              liveUrl: newProject.liveUrl || "",
+              technologies: newProject.technologies || [],
+            }
+          : project,
+      );
+
+      setProjects(updatedProjects);
+
+      updateData("projectInfo", updatedProjects);
+
+      setEditingProjectId(null);
+    }*/
+    if (editingProjectId) {
+      await handleUpdate();
+      return;
+    }
+
+    // -----------------------------
+    // CREATE NEW PROJECT
+    // -----------------------------
+    else {
+  try {
+    const project: Project = {
+      id: crypto.randomUUID(),
+
+      title: newProject.title || "",
+
+      description: newProject.description || "",
+
+      githubUrl: newProject.githubUrl || "",
+
+      liveUrl: newProject.liveUrl || "",
+
+      technologies: newProject.technologies || [],
+
+      isPrimary: projects.length === 0,
+    };
+
+    await insertProject(project);
+
+    setAlert({
+      type: "success",
+      message: "Project added successfully",
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    setAlert({
+      type: "error",
+      message: error.message || "Failed to add project",
+    });
+
+    return;
+  }
+}
+
+    // -----------------------------
+    // RESET FORM
+    // -----------------------------
+    setIsAdding(false);
+
+    setNewProject({
+      title: "",
+      description: "",
+      githubUrl: "",
+      liveUrl: "",
+      technologies: [],
+    });
+
+    setTechInput("");
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {alert && (
+        <Toast
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+      <header className="mb-12 flex justify-between items-start">
+        <div className="max-w-xl">
+          <h2 className="text-4xl font-extrabold font-headline tracking-tight text-on-surface mb-3">
+            Showcase your best work
+          </h2>
+          <p className="text-on-surface-variant leading-relaxed">
+            Add projects that demonstrate your technical proficiency.
+            High-quality project details help technical recruiters understand
+            your impact.
+          </p>
+        </div>
+        <div className="flex gap-4">
+          <button
+            onClick={onPrev}
+            className="px-6 py-2.5 rounded-xl border border-outline text-on-surface font-semibold hover:bg-surface-container-low transition-colors active:scale-95"
+          >
+            Skip for now
+          </button>
+          <button
+            onClick={onNext}
+            className="px-8 py-2.5 rounded-xl bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 hover:shadow-xl hover:translate-y-[-1px] transition-all active:scale-95"
+          >
+            Save & Continue
+          </button>
+        </div>
+      </header>
+
+      <div className="space-y-6">
+        {/* Action Header */}
+        <div className="flex justify-between items-center pb-4 border-b border-outline-variant">
+          <h3 className="text-xl font-bold font-headline text-on-surface">
+            Project Portfolio
+          </h3>
+          {!isAdding && (
+            <button
+              onClick={() => setIsAdding(true)}
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary-container text-on-primary-container rounded-xl font-bold text-sm hover:brightness-95 transition-all shadow-sm"
+            >
+              <PlusCircle className="w-5 h-5" />
+              {editingProjectId ? "Edit Project" : "Add New Project"}
+            </button>
+          )}
+        </div>
+
+        <AnimatePresence>
+          {isAdding && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-8 glass-card p-8 rounded-3xl border border-primary/30 shadow-md bg-white/80"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="text-xl font-extrabold text-on-surface font-headline">
+                  Add New Project
+                </h4>
+                <button
+                  onClick={() => {
+                    setIsAdding(false);
+                    setEditingProjectId(null);
+
+                    setNewProject({
+                      title: "",
+                      description: "",
+                      githubUrl: "",
+                      liveUrl: "",
+                      technologies: [],
+                    });
+
+                    setTechInput("");
+                  }}
+                  className="text-on-surface-variant hover:text-error transition-colors"
+                  type="button"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <form onSubmit={saveProject} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                  <div className="space-y-2 col-span-full">
+                    <label className="block text-sm font-bold text-on-surface font-headline">
+                      Project Title
+                    </label>
+                    <input
+                      value={newProject.title}
+                      onChange={(e) =>
+                        setNewProject((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none text-on-surface"
+                      placeholder="e.g., Cloud-Native Analytics Engine"
+                      type="text"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2 col-span-full">
+                    <label className="block text-sm font-bold text-on-surface font-headline">
+                      Description
+                    </label>
+                    <textarea
+                      value={newProject.description}
+                      onChange={(e) =>
+                        setNewProject((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none text-on-surface resize-none"
+                      placeholder="Describe the problem you solved, the architecture, and your specific contributions..."
+                      rows={4}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-on-surface font-headline">
+                      GitHub Repository Link
+                    </label>
+                    <div className="relative">
+                      <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
+                      <input
+                        value={newProject.githubUrl}
+                        onChange={(e) =>
+                          setNewProject((prev) => ({
+                            ...prev,
+                            githubUrl: e.target.value,
+                          }))
+                        }
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none text-on-surface"
+                        placeholder="github.com/username/project"
+                        type="url"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-on-surface font-headline">
+                      Live Project URL (Optional)
+                    </label>
+                    <div className="relative">
+                      <Rocket className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-5 h-5" />
+                      <input
+                        value={newProject.liveUrl}
+                        onChange={(e) =>
+                          setNewProject((prev) => ({
+                            ...prev,
+                            liveUrl: e.target.value,
+                          }))
+                        }
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none text-on-surface"
+                        placeholder="project-demo.com"
+                        type="url"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2 col-span-full">
+                    <label className="block text-sm font-bold text-on-surface font-headline">
+                      Key Technologies
+                    </label>
+                    <input
+                      value={techInput}
+                      onChange={(e) => setTechInput(e.target.value)}
+                      onKeyDown={handleAddTech}
+                      className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none text-on-surface"
+                      placeholder="Type a technology and press Enter (e.g., React, Go, Docker)"
+                      type="text"
+                    />
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {(newProject.technologies || []).map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-lg text-xs font-bold flex items-center gap-1"
+                        >
+                          {tech}
+                          <X
+                            onClick={() => removeTech(tech)}
+                            className="w-3 h-3 cursor-pointer hover:text-error transition-colors"
+                          />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                  <button
+                    onClick={() => {
+                      setIsAdding(false);
+                      setEditingProjectId(null);
+
+                      setNewProject({
+                        title: "",
+                        description: "",
+                        githubUrl: "",
+                        liveUrl: "",
+                        technologies: [],
+                      });
+
+                      setTechInput("");
+                    }}
+                    className="px-6 py-2.5 rounded-xl border border-outline text-on-surface font-semibold hover:bg-surface-container-low transition-colors"
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-8 py-2.5 rounded-xl bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all"
+                    type="submit"
+                  >
+                    {editingProjectId ? "Update Project" : "Add to Portfolio"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Project Listing */}
+        <div className="grid gap-6 mt-8">
+          {projects.map((project) => (
+            <motion.div
+              layout
+              key={project.id}
+              className="glass-card group p-8 rounded-3xl border border-outline-variant shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h4 className="text-xl font-extrabold text-on-surface font-headline">
+                      {project.title}
+                    </h4>
+                    {project.isPrimary && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[10px] font-bold uppercase tracking-wider">
+                        Primary
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-on-surface-variant leading-relaxed mb-6 max-w-2xl">
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {project.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-lg text-xs font-bold"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-6 text-sm text-on-surface-variant font-medium">
+                    <a
+                      className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                      href="#"
+                    >
+                      <LinkIcon className="w-[18px] h-[18px]" />
+                      {project.githubUrl}
+                    </a>
+                    {project.liveUrl && (
+                      <a
+                        className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                        href="#"
+                      >
+                        <Rocket className="w-[18px] h-[18px]" />
+                        {project.liveUrl}
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => editProject(project)}
+                    className="p-2.5 rounded-xl hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-all"
+                    title="Edit project"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project.id)}
+                    className="p-2.5 rounded-xl hover:bg-error-container text-on-surface-variant hover:text-error transition-all"
+                    title={deleting ? "Deleting" : "Delete project"}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {/* Empty State / Add Placeholder */}
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            onClick={() => setIsAdding(true)}
+            className="border-2 border-dashed border-outline-variant rounded-3xl p-10 flex flex-col items-center justify-center text-center bg-white/10 hover:bg-primary/5 hover:border-primary transition-all cursor-pointer group"
+          >
+            <div className="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+              <Plus className="w-8 h-8" />
+            </div>
+            <p className="text-lg font-bold text-on-surface">
+              Add another project
+            </p>
+            <p className="text-sm text-on-surface-variant mt-1">
+              Showcase your versatility across different stacks.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Footer Pro Tip */}
+      <footer className="mt-12 glass-card p-6 rounded-3xl border border-outline-variant bg-gradient-to-br from-tertiary-container/10 to-transparent flex items-start gap-4">
+        <div className="w-10 h-10 rounded-full bg-tertiary-container flex-shrink-0 flex items-center justify-center">
+          <Lightbulb className="w-5 h-5 text-on-tertiary-container" />
+        </div>
+        <div>
+          <h5 className="text-sm font-bold text-on-surface mb-1">
+            Portfolio Strategy
+          </h5>
+          <p className="text-sm leading-relaxed text-on-surface-variant">
+            Hiring managers value quality over quantity. Feature 2-3 projects
+            where you had a significant architectural impact. Be sure to
+            highlight the "why" behind your technical decisions.
+          </p>
+        </div>
+      </footer>
+
+      {/* Mobile Navigation (Visible only on small screens) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant p-4 flex justify-between lg:hidden z-50">
+        <button className="px-4 py-2 text-on-surface font-semibold text-sm">
+          Skip
+        </button>
+        <button className="px-6 py-2 bg-primary text-on-primary font-bold text-sm rounded-xl shadow-lg">
+          Save & Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/*function FeaturedProject({
   onNext,
   onPrev,
 }: {
@@ -713,7 +1505,7 @@ function FeaturedProject({
       </div>
     </div>
   );
-}
+}*/
 
 function CareerGoalsView({
   onNext,
@@ -1063,8 +1855,10 @@ function FormField({
   type = "text",
   value,
   onChange,
+  disabled = false,
 }: {
   label: string;
+  disabled?: boolean;
   icon?: React.ReactNode;
   placeholder: string;
   type?: string;
@@ -1073,9 +1867,7 @@ function FormField({
 }) {
   return (
     <div className="space-y-2.5">
-      <label className="text-sm font-bold text-slate-700 ml-1">
-        {label}
-      </label>
+      <label className="text-sm font-bold text-slate-700 ml-1">{label}</label>
 
       <div className="relative group">
         {icon && (
@@ -1087,6 +1879,7 @@ function FormField({
         <input
           type={type}
           value={value}
+          disabled={disabled}
           onChange={(e) => onChange?.(e.target.value)}
           className={`w-full ${
             icon ? "pl-12" : "pl-5"
@@ -1118,8 +1911,12 @@ function SelectField({
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors z-10 pointer-events-none">
           {icon}
         </div>
-        <select onChange={(e) => onChange(e.target.value)} value={value} className="w-full pl-12 pr-12 py-4 rounded-2xl border border-slate-200 bg-white/60 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-800 appearance-none outline-none shadow-sm font-medium">
-          <option value="" disabled selected>
+        <select
+          onChange={(e) => onChange(e.target.value)}
+          value={value}
+          className="w-full pl-12 pr-12 py-4 rounded-2xl border border-slate-200 bg-white/60 focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-slate-800 appearance-none outline-none shadow-sm font-medium"
+        >
+          <option value="" disabled>
             Select {label}
           </option>
           {options.map((opt) => (

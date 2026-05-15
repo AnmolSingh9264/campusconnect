@@ -166,6 +166,7 @@ export default function SignUP2() {
         course,
         branch,
         year,
+        50
       );
       console.log("SignUp successful");
       navigate("/signup3", {

@@ -9,9 +9,19 @@ type AuthContextType = {
   checkIsVerified: () => Promise<boolean>;
   resendEmail: (email: string) => Promise<void>;
   sendResetLink: (email: string) => Promise<void>;
-  updatePassword:(password: string) => Promise<void>;
-  signInWithGoogle:() => Promise<void>;
-  signInWithGithub:() => Promise<void>;
+    updateProgress: (
+    progress: number
+  ) => Promise<void>;
+  updateUser:( fullname: string,
+    gender: String,
+    university: string,
+    course: string,
+    branch: string,
+    year: string,
+  ) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithGithub: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     email: string,
@@ -22,6 +32,7 @@ type AuthContextType = {
     course: string,
     branch: string,
     year: string,
+    progress: number
   ) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -58,82 +69,122 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
   };
 
-   const signInWithGoogle = async () => {
+  const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    })
+      provider: "google",
+    });
 
     if (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
-  }
-     const signInWithGithub = async () => {
+  };
+  const signInWithGithub = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-    })
+      provider: "github",
+    });
 
     if (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
-  }
+  };
+
+  const updateProgress = async (
+    progress: number
+  ) => {
+    const { error } =
+      await supabase.auth.updateUser({
+        data: {
+          progress,
+        },
+      });
+
+    if (error) throw error;
+  };
 
   const checkIsVerified = async (): Promise<boolean> => {
-   const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getUser();
 
-  if (error || !data.user) {
-    console.log("no user");
-    return false;
-  }
+    if (error || !data.user) {
+      console.log("no user");
+      return false;
+    }
 
-  console.log("fresh email:", data.user.email);
-  console.log("fresh confirmed:", data.user.email_confirmed_at);
+    console.log("fresh email:", data.user.email);
+    console.log("fresh confirmed:", data.user.email_confirmed_at);
 
-  if (data.user.email_confirmed_at) {
-    console.log("confirmed");
-    return true;
-  } else {
-    console.log("not confirmed");
-    return false;
-  }
-};
+    if (data.user.email_confirmed_at) {
+      console.log("confirmed");
+      return true;
+    } else {
+      console.log("not confirmed");
+      return false;
+    }
+  };
 
   const resendEmail = async (email: string) => {
-  const { error } = await supabase.auth.resend({
-    type: "signup",
-    email: email,
-  });
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email,
+    });
 
-  if (error) {
-    console.error(error.message);
-    throw error;
-  }
-};
+    if (error) {
+      console.error(error.message);
+      throw error;
+    }
+  };
 
-const sendResetLink = async (email: string) => {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://campusconnect-two-omega.vercel.app/updatepassword",
-  });
+  const sendResetLink = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://campusconnect-two-omega.vercel.app/updatepassword",
+    });
 
-  if (error) {
-    console.log(error.message);
-    throw error
-  } else {
-    console.log("Reset email sent");
-  }
-};
+    if (error) {
+      console.log(error.message);
+      throw error;
+    } else {
+      console.log("Reset email sent");
+    }
+  };
 
-const updatePassword = async (password: string) => {
-  const { error } = await supabase.auth.updateUser({
-   password: password
-  });
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    });
 
-  if (error) {
-    console.log(error.message);
-    throw error
-  } else {
-    console.log("Reset email sent");
-  }
-};
+    if (error) {
+      console.log(error.message);
+      throw error;
+    } else {
+      console.log("Reset email sent");
+    }
+  };
+
+  const updateUser = async (
+    fullname: string,
+    gender: String,
+    university: string,
+    course: string,
+    branch: string,
+    year: string,
+  ) => {
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        full_name: fullname,
+        university: university,
+        course: course,
+        branch: branch,
+        year: year,
+        gender: gender,
+      },
+    });
+
+    if (error) {
+      console.log(error.message);
+      throw error;
+    } else {
+      console.log("User updated");
+    }
+  };
 
   const signUp = async (
     email: string,
@@ -144,13 +195,14 @@ const updatePassword = async (password: string) => {
     course: string,
     branch: string,
     year: string,
+    progress:number,
   ) => {
     await supabase.auth.signOut();
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo:"https://campusconnect-two-omega.vercel.app/login",
+        emailRedirectTo: "https://campusconnect-two-omega.vercel.app/login",
         data: {
           full_name: fullname,
           gender,
@@ -158,6 +210,7 @@ const updatePassword = async (password: string) => {
           course,
           branch,
           year,
+          progress,
         },
       },
     });
@@ -171,7 +224,22 @@ const updatePassword = async (password: string) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut, resendEmail, checkIsVerified, sendResetLink, updatePassword, signInWithGoogle, signInWithGithub}}
+      value={{
+        user,
+        session,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        resendEmail,
+        checkIsVerified,
+        sendResetLink,
+        updatePassword,
+        signInWithGoogle,
+        signInWithGithub,
+        updateUser,
+        updateProgress
+      }}
     >
       {children}
     </AuthContext.Provider>
