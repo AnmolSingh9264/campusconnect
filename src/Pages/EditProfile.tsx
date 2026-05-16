@@ -1301,7 +1301,7 @@ function FeaturedProject({
           ))}
 
           {/* Empty State / Add Placeholder */}
-          <motion.div
+          {/*<motion.div
             whileHover={{ scale: 1.01 }}
             onClick={() => setIsAdding(true)}
             className="border-2 border-dashed border-outline-variant rounded-3xl p-10 flex flex-col items-center justify-center text-center bg-white/10 hover:bg-primary/5 hover:border-primary transition-all cursor-pointer group"
@@ -1315,7 +1315,7 @@ function FeaturedProject({
             <p className="text-sm text-on-surface-variant mt-1">
               Showcase your versatility across different stacks.
             </p>
-          </motion.div>
+          </motion.div>*/}
         </div>
       </div>
 
