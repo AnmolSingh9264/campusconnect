@@ -353,7 +353,7 @@ function SidebarStep({
   );
 }
 
-function BasicInformation({ onNext }: { onNext: () => void }) {
+function BasicInformation({ }: { onNext: () => void }) {
   const { currentStep, nextStep, onboardingData, updateData } = useOnboarding();
 
   const [alert, setAlert] = useState<{
