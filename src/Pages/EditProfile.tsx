@@ -1,7 +1,7 @@
 import "../../src/css/EditProfile.css";
 import React, { useState, useEffect, useMemo } from "react";
 import Github from "@/assets/ic_github.png";
-import Linkedin from "@/assets/Linkedin.png";
+import Linkedin from "@/assets/LinkedIn.png";
 import {
   Bell,
   Settings,
