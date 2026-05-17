@@ -1,5 +1,7 @@
 import "../../src/css/EditProfile.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import Github from "@/assets/ic_github.png";
+import Linkedin from "@/assets/Linkedin.png";
 import {
   Bell,
   Settings,
@@ -15,7 +17,7 @@ import {
   School,
   Book,
   Calendar,
-  Layers,
+  Eye,
   ChevronDown,
   X,
   Plus,
@@ -27,7 +29,6 @@ import {
   Briefcase,
   Globe,
   Building2,
-  History,
   Zap,
   Users,
   Target as TargetIcon,
@@ -37,6 +38,14 @@ import {
   Network as Hub,
   User as Wc,
   SpaceIcon,
+  ChevronRight,
+  Search,
+  Cpu,
+  GraduationCap,
+  HeartPlus,
+  ShoppingCart,
+  Leaf,
+  Smartphone,
 } from "lucide-react";
 import {
   useUniversities,
@@ -89,15 +98,122 @@ interface Project {
   industries: string[];
   teamSize: number;
 }*/
+interface Skill {
+  id: string;
+  name: string;
+  level: string;
+  progress: number;
+}
+
+interface Industry {
+  id: string;
+  name: string;
+  icon: any;
+}
+
+const INDUSTRIES: Industry[] = [
+  { id: "fintech", name: "FinTech", icon: Building2 },
+  { id: "ai-ml", name: "AI & ML", icon: Cpu },
+  { id: "edtech", name: "EdTech", icon: GraduationCap },
+  { id: "healthtech", name: "HealthTech", icon: HeartPlus },
+  { id: "e-commerce", name: "E-Commerce", icon: ShoppingCart },
+  { id: "greentech", name: "GreenTech", icon: Leaf },
+];
+
+const TECHNICAL_SKILLS_LIBRARY = [
+  "React",
+  "Next.js",
+  "TypeScript",
+  "Node.js",
+  "Express",
+  "JavaScript",
+  "Python",
+  "Go",
+  "Rust",
+  "AWS",
+  "Docker",
+  "Kubernetes",
+  "GraphQL",
+  "PostgreSQL",
+  "MongoDB",
+  "Redis",
+  "Tailwind CSS",
+  "Figma",
+  "Product Design",
+  "System Architecture",
+  "CI/CD",
+  "Jest",
+  "Cypress",
+];
+
+const JOB_ROLES_LIBRARY = [
+  "Product Architect",
+  "Lead Engineer",
+  "Full Stack Developer",
+  "Frontend Engineer",
+  "Backend Engineer",
+  "DevOps Engineer",
+  "Mobile Developer",
+  "UI/UX Designer",
+  "Data Scientist",
+  "Machine Learning Engineer",
+  "Product Manager",
+  "Security Engineer",
+];
+
+/*function SelectionCard({
+  icon,
+  title,
+  subtitle,
+  selected,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  selected?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative p-5 rounded-3xl border-2 text-left transition-all duration-300 group overflow-hidden ${
+        selected
+          ? "border-primary bg-primary/5 shadow-[0_10px_30px_rgba(79,55,138,0.08)]"
+          : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+      }`}
+    >
+      <div
+        className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-4 transition-all ${
+          selected
+            ? "bg-primary text-white"
+            : "bg-slate-100 text-slate-500 group-hover:bg-primary/10 group-hover:text-primary"
+        }`}
+      >
+        {icon}
+      </div>
+
+      <h4 className="font-bold text-slate-900">{title}</h4>
+      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+        {subtitle}
+      </p>
+
+      {selected && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-4 right-4"
+        >
+          <CheckCircle2 className="w-5 h-5 text-primary fill-current" />
+        </motion.div>
+      )}
+    </button>
+  );
+}*/
 
 export default function EditProfile() {
-  const {
-    currentStep,
-    nextStep,
-    prevStep,
-    goToStep,
-    progress,
-  } = useOnboarding();
+  const { currentStep, nextStep, prevStep, goToStep, progress } =
+    useOnboarding();
 
   /* const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
 
@@ -161,26 +277,26 @@ export default function EditProfile() {
             />
             <SidebarStep
               icon={<Target className="w-5 h-5" />}
-              label="Career Goals"
+              label="Skills & Interests"
               active={currentStep === 3}
               completed={currentStep > 3}
               status={
                 currentStep === 3
-                  ? "Refining"
+                  ? "Final Step"
                   : currentStep > 3
                     ? "Completed"
                     : "Next Step"
               }
               onClick={() => currentStep >= 3 && goToStep(3)}
             />
-            <SidebarStep
+            {/*<SidebarStep
               icon={<BrainCircuit className="w-5 h-5" />}
               label="Skills & Interests"
               active={currentStep === 4}
               completed={currentStep > 4}
               status={currentStep === 4 ? "Personalizing" : "Final Step"}
               onClick={() => currentStep >= 4 && goToStep(4)}
-            />
+            />*/}
           </div>
         </nav>
 
@@ -353,7 +469,7 @@ function SidebarStep({
   );
 }
 
-function BasicInformation({ }: { onNext: () => void }) {
+function BasicInformation({}: { onNext: () => void }) {
   const { currentStep, nextStep, onboardingData, updateData } = useOnboarding();
 
   const [alert, setAlert] = useState<{
@@ -763,9 +879,16 @@ function FeaturedProject({
       technologies: ["Python", "AWS Lambda", "Next.js"],
     },
   ]);*/
-  const { onboardingData, updateData, deleteProject, updateProject, insertProject } =
-    useOnboarding();
- const projects:Project[] = (onboardingData.projectInfo || []).filter(Boolean);
+  const {
+    onboardingData,
+    updateData,
+    deleteProject,
+    updateProject,
+    insertProject,
+  } = useOnboarding();
+  const projects: Project[] = (onboardingData.projectInfo || []).filter(
+    Boolean,
+  );
   const [deleting, setDeleting] = useState(false);
   const [alert, setAlert] = useState<{
     type: AlertType;
@@ -952,40 +1075,40 @@ function FeaturedProject({
     // CREATE NEW PROJECT
     // -----------------------------
     else {
-  try {
-    const project: Project = {
-      id: crypto.randomUUID(),
+      try {
+        const project: Project = {
+          id: crypto.randomUUID(),
 
-      title: newProject.title || "",
+          title: newProject.title || "",
 
-      description: newProject.description || "",
+          description: newProject.description || "",
 
-      githubUrl: newProject.githubUrl || "",
+          githubUrl: newProject.githubUrl || "",
 
-      liveUrl: newProject.liveUrl || "",
+          liveUrl: newProject.liveUrl || "",
 
-      technologies: newProject.technologies || [],
+          technologies: newProject.technologies || [],
 
-      isPrimary: projects.length === 0,
-    };
+          isPrimary: projects.length === 0,
+        };
 
-    await insertProject(project);
+        await insertProject(project);
 
-    setAlert({
-      type: "success",
-      message: "Project added successfully",
-    });
-  } catch (error: any) {
-    console.error(error);
+        setAlert({
+          type: "success",
+          message: "Project added successfully",
+        });
+      } catch (error: any) {
+        console.error(error);
 
-    setAlert({
-      type: "error",
-      message: error.message || "Failed to add project",
-    });
+        setAlert({
+          type: "error",
+          message: error.message || "Failed to add project",
+        });
 
-    return;
-  }
-}
+        return;
+      }
+    }
 
     // -----------------------------
     // RESET FORM
@@ -1514,7 +1637,666 @@ function CareerGoalsView({
   onNext: () => void;
   onPrev: () => void;
 }) {
+ 
+
+  // Forms State
+  const [website, setWebsite] = useState("");
+  const [github, setGithub] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+
+  // Technical Skills State
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skillSearch, setSkillSearch] = useState("");
+  const [showSkillSuggestions, setShowSkillSuggestions] = useState(false);
+
+  // Industry Interests State
+  const [industryFilter, setIndustryFilter] = useState("");
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+
+  // Work Preferences State
+  const [jobRoles, setJobRoles] = useState<string[]>([]);
+  const [roleSearch, setRoleSearch] = useState("");
+  const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
+  const [workEnvironment, setWorkEnvironment] = useState("");
+
+  // Logic: Filtered Skills (User's already added skills)
+  const filteredUserSkills = useMemo(() => {
+    return skills.filter((s) =>
+      s.name.toLowerCase().includes(skillSearch.toLowerCase()),
+    );
+  }, [skills, skillSearch]);
+
+  // Logic: Skill Library Suggestions
+  const skillSuggestions = useMemo(() => {
+    if (!skillSearch.trim()) return [];
+    return TECHNICAL_SKILLS_LIBRARY.filter(
+      (s) =>
+        s.toLowerCase().includes(skillSearch.toLowerCase()) &&
+        !skills.some((existing) => existing.name === s),
+    ).slice(0, 5);
+  }, [skillSearch, skills]);
+
+  // Logic: Filtered Industries
+  const filteredIndustries = useMemo(() => {
+    return INDUSTRIES.filter((i) =>
+      i.name.toLowerCase().includes(industryFilter.toLowerCase()),
+    );
+  }, [industryFilter]);
+
+  // Logic: Role Library Suggestions
+  const roleSuggestions = useMemo(() => {
+    if (!roleSearch.trim()) return [];
+    return JOB_ROLES_LIBRARY.filter(
+      (r) =>
+        r.toLowerCase().includes(roleSearch.toLowerCase()) &&
+        !jobRoles.includes(r),
+    ).slice(0, 5);
+  }, [roleSearch, jobRoles]);
+
+  const handleAddSkillFromLibrary = (skillName: string) => {
+    const newSkill: Skill = {
+      id: Date.now().toString(),
+      name: skillName,
+      level: "Intermediate",
+      progress: 40,
+    };
+    setSkills([...skills, newSkill]);
+    setSkillSearch("");
+    setShowSkillSuggestions(false);
+  };
+
+  const updateSkillProgress = (id: string, segmentIndex: number) => {
+    const newProgress = (segmentIndex + 1) * 20;
+    let newLevel = "Beginner";
+
+    if (newProgress >= 90) newLevel = "Expert";
+    else if (newProgress >= 70) newLevel = "Advanced";
+    else if (newProgress >= 40) newLevel = "Intermediate";
+
+    setSkills((prev) =>
+      prev.map((s) =>
+        s.id === id ? { ...s, progress: newProgress, level: newLevel } : s,
+      ),
+    );
+  };
+
+  const addRoleFromLibrary = (roleName: string) => {
+    if (!jobRoles.includes(roleName)) {
+      setJobRoles([...jobRoles, roleName]);
+      setRoleSearch("");
+      setShowRoleSuggestions(false);
+    }
+  };
+
+  const toggleIndustry = (id: string) => {
+    setSelectedIndustries((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
+  };
   return (
+    <div className="max-w-4xl mx-auto pb-20">
+      <header className="mb-12">
+        <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+          Define your career vision.
+        </h2>
+        <p className="text-lg text-slate-500 max-w-2xl leading-relaxed">
+          We use your goals to match you with elite opportunities that align
+          with your professional trajectory and financial expectations.
+        </p>
+      </header>
+      {/* Mobile Sidebar Overlay */}
+     {/* <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+     {/* <aside
+        className={`
+        fixed lg:static inset-y-0 left-0 w-[280px] bg-white lg:bg-transparent border-r border-outline-variant p-6 lg:p-8 flex flex-col justify-between shrink-0 z-50 transition-transform duration-300
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+      `}
+      >
+        <div>
+          <div className="mb-10 lg:mb-12 flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-primary mb-1">
+                Hire Skills
+              </h1>
+              <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">
+                Onboarding Journey
+              </p>
+            </div>
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-2"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <nav className="space-y-6 lg:space-y-8">
+            {steps.map((step) => (
+              <div
+                key={step.id}
+                className="flex items-start gap-4 group cursor-default"
+              >
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors
+                  ${
+                    step.status === "completed"
+                      ? "bg-primary border-primary text-on-primary"
+                      : step.status === "in-progress"
+                        ? "border-primary text-primary"
+                        : "border-outline-variant text-outline"
+                  }
+                `}
+                >
+                  {step.status === "completed" ? (
+                    <Check size={16} strokeWidth={3} />
+                  ) : (
+                    <span className="text-sm font-bold">{step.id}</span>
+                  )}
+                </div>
+                <div>
+                  <h3
+                    className={`text-sm font-bold transition-colors ${step.status === "in-progress" ? "text-primary" : step.status === "upcoming" ? "text-outline/70" : "text-on-surface"}`}
+                  >
+                    {step.title}
+                  </h3>
+                  {step.status === "completed" && (
+                    <p className="text-[10px] uppercase tracking-wide font-bold text-on-surface-variant/60">
+                      Completed
+                    </p>
+                  )}
+                  {step.status === "in-progress" && (
+                    <p className="text-[10px] uppercase tracking-wide font-bold text-primary">
+                      In Progress
+                    </p>
+                  )}
+                  {step.status === "upcoming" && (
+                    <p className="text-[10px] uppercase tracking-wide font-bold text-outline/40">
+                      Up Next
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </nav>
+        </div>
+
+        <div className="bg-surface-container/50 rounded-xl p-4 border border-outline-variant mt-8">
+          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3 opacity-70">
+            Support
+          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-outline-variant shadow-sm shrink-0">
+              <HelpCircle size={14} className="text-primary" />
+            </div>
+            <p className="text-[11px] font-semibold text-on-surface-variant leading-tight">
+              Need help refining your profile?
+            </p>
+          </div>
+        </div>
+      </aside>*/}
+
+      {/* Main Content */}
+     {/* <main className="flex-1 overflow-y-auto w-full">
+        <div className="max-w-[1100px] mx-auto p-4 md:p-8 lg:p-10">
+          <header className="mb-8 md:mb-12">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+              <div className="flex items-center gap-2 text-sm text-on-surface-variant">
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="lg:hidden p-2 -ml-2 hover:bg-surface-container rounded-lg"
+                >
+                  <Menu size={20} />
+                </button>
+                <span className="hidden sm:inline">Onboarding</span>
+                <ChevronRight size={14} className="hidden sm:inline" />
+                <span className="font-semibold text-on-surface">
+                  Professional Persona
+                </span>
+              </div>
+              <div className="flex items-center gap-3 md:gap-4">
+                <button className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors">
+                  <Bell size={20} />
+                </button>
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-outline-variant ring-2 ring-primary/5">
+                  <img
+                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt="User"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight leading-tight">
+              Refine your professional persona
+            </h2>
+            <p className="text-on-surface-variant text-base md:text-lg max-w-2xl">
+              Connect your professional networks and highlight the technical
+              expertise that sets you apart.
+            </p>
+          </header> */}
+
+          <div className="space-y-6 md:space-y-8">
+            {/* Social & Portfolios */}
+            <section className="glass-card p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6 md:mb-8">
+                <div className="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary shrink-0">
+                  <LinkIcon size={20} />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">
+                  Social & Portfolios
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest flex items-center gap-1.5 ml-1">
+                    <Globe size={12} /> Personal Website
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-outline-variant group-focus-within:text-primary transition-colors">
+                      <Globe size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="portfolio.dev"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      className="w-full bg-surface-container-low/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all placeholder:text-outline-variant/50"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest flex items-center gap-1.5 ml-1">
+                    <img src={Github} alt="GitHub" className="w-4 h-4" /> GitHub
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-outline-variant group-focus-within:text-primary transition-colors">
+                      <img src={Github} alt="GitHub" className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="github.com/username"
+                      value={github}
+                      onChange={(e) => setGithub(e.target.value)}
+                      className="w-full bg-surface-container-low/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all placeholder:text-outline-variant/50"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest flex items-center gap-1.5 ml-1">
+                    <img src={Linkedin} alt="GitHub" className="w-4 h-4" />{" "}
+                    LinkedIn
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center text-outline-variant group-focus-within:text-primary transition-colors">
+                      <img src={Linkedin} alt="GitHub" className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="linkedin.com/in/username"
+                      value={linkedin}
+                      onChange={(e) => setLinkedin(e.target.value)}
+                      className="w-full bg-surface-container-low/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all placeholder:text-outline-variant/50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+              {/* Technical Skills */}
+              <section className="glass-card p-6 md:p-8 flex flex-col">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary shrink-0">
+                    <Lightbulb size={20} />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold">
+                    Technical Skills
+                  </h3>
+                </div>
+
+                <div className="mb-8 relative group">
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search technologies..."
+                    value={skillSearch}
+                    onChange={(e) => {
+                      setSkillSearch(e.target.value);
+                      setShowSkillSuggestions(true);
+                    }}
+                    onFocus={() => setShowSkillSuggestions(true)}
+                    className="w-full bg-white border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-sm focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all shadow-inner-sm"
+                  />
+
+                  {/* Skill Suggestions Dropdown */}
+                  <AnimatePresence>
+                    {showSkillSuggestions && skillSuggestions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute z-10 w-full mt-2 bg-white border border-outline-variant rounded-xl shadow-xl overflow-hidden"
+                      >
+                        {skillSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            onClick={() =>
+                              handleAddSkillFromLibrary(suggestion)
+                            }
+                            className="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-primary/5 hover:text-primary transition-colors border-b border-outline-variant/30 last:border-0"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="space-y-8 mb-auto">
+                  {filteredUserSkills.map((skill) => (
+                    <div key={skill.id} className="space-y-3 group/skill">
+                      <div className="flex justify-between items-center text-sm font-bold">
+                        <div className="flex items-center gap-2">
+                          <span>{skill.name}</span>
+                          <button
+                            onClick={() =>
+                              setSkills(skills.filter((s) => s.id !== skill.id))
+                            }
+                            className="text-outline-variant hover:text-error opacity-0 group-hover/skill:opacity-100 transition-all scale-75"
+                          >
+                            <X size={14} strokeWidth={3} />
+                          </button>
+                        </div>
+                        <span className="text-primary text-[10px] uppercase tracking-widest bg-primary/5 px-2 py-0.5 rounded-full">
+                          {skill.level}
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-surface-container rounded-full overflow-hidden flex gap-1 cursor-pointer">
+                        {[...Array(5)].map((_, i) => (
+                          <div
+                            key={i}
+                            onClick={() => updateSkillProgress(skill.id, i)}
+                            className={`flex-1 transition-all duration-300 hover:opacity-80 active:scale-95 ${i * 20 < skill.progress ? "primary-gradient" : "bg-surface-container"}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {filteredUserSkills.length === 0 && skills.length > 0 && (
+                    <p className="text-center text-on-surface-variant/60 text-xs py-10 font-medium italic bg-surface-container/20 rounded-xl border border-dashed border-outline-variant/30">
+                      No matching skills found in your profile.
+                    </p>
+                  )}
+                  {skills.length === 0 && (
+                    <p className="text-center text-on-surface-variant/60 text-xs py-10 font-medium italic bg-surface-container/20 rounded-xl border border-dashed border-outline-variant/30">
+                      Search and select skills to add them to your profile.
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-10">
+                  <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">
+                    Suggested for you
+                  </p>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {TECHNICAL_SKILLS_LIBRARY.slice(0, 6)
+                      .filter(
+                        (s) => !skills.some((existing) => existing.name === s),
+                      )
+                      .map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => handleAddSkillFromLibrary(suggestion)}
+                          className="px-4 py-2 border-2 border-outline-variant rounded-xl text-xs font-bold text-on-surface-variant hover:border-primary hover:text-primary hover:bg-primary/5 transition-all flex items-center gap-1.5"
+                        >
+                          <Plus size={14} strokeWidth={3} /> {suggestion}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Industry Interests */}
+              <section className="glass-card p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary shrink-0">
+                    <Eye size={20} />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold">
+                    Industry Interests
+                  </h3>
+                </div>
+
+                <div className="mb-8 relative group">
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Filter industries..."
+                    value={industryFilter}
+                    onChange={(e) => setIndustryFilter(e.target.value)}
+                    className="w-full bg-white border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-sm focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all shadow-inner-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {filteredIndustries.map((industry) => {
+                    const Icon = industry.icon;
+                    const isSelected = selectedIndustries.includes(industry.id);
+                    return (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        key={industry.id}
+                        onClick={() => toggleIndustry(industry.id)}
+                        className={`p-5 md:p-6 rounded-xl border-2 flex flex-col items-start gap-4 transition-all text-left group
+                          ${isSelected ? "bg-primary-container/5 border-primary shadow-md shadow-primary/5" : "bg-surface-container-low border-outline-variant/60 hover:border-primary/40"}
+                        `}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300
+                          ${isSelected ? "bg-primary text-on-primary rotate-3 scale-110 shadow-lg shadow-primary/20" : "bg-white border border-outline-variant/40 text-outline group-hover:text-primary group-hover:bg-primary/5"}
+                        `}
+                        >
+                          <Icon size={20} />
+                        </div>
+                        <span
+                          className={`text-sm font-bold tracking-tight ${isSelected ? "text-primary" : "text-on-surface/80"}`}
+                        >
+                          {industry.name}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
+
+            {/* Work Preferences */}
+            <section className="glass-card p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-10">
+                <div className="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary shrink-0">
+                  <Briefcase size={20} />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">
+                  Work Preferences
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-10 md:gap-12">
+                <div className="space-y-6">
+                  <div>
+                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-4 block">
+                      Desired Job Roles
+                    </label>
+                    <div className="space-y-3">
+                      <AnimatePresence mode="popLayout">
+                        {jobRoles.map((role) => (
+                          <motion.div
+                            layout
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            key={role}
+                            className="flex items-center justify-between p-4 bg-surface-container-low border border-outline-variant rounded-xl group hover:border-primary hover:shadow-sm transition-all"
+                          >
+                            <div className="flex items-center gap-3 text-primary">
+                              <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                                <Smartphone size={16} />
+                              </div>
+                              <span className="text-sm font-bold">{role}</span>
+                            </div>
+                            <button
+                              onClick={() =>
+                                setJobRoles(jobRoles.filter((r) => r !== role))
+                              }
+                              className="text-outline-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error/5"
+                            >
+                              <X size={18} />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      <div className="relative pt-2 group">
+                        <Search
+                          className="absolute left-4 top-[calc(50%+4px)] -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+                          size={16}
+                        />
+                        <input
+                          className="w-full bg-white border-2 border-dashed border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-xs font-bold focus:border-primary focus:border-solid focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                          placeholder="Search and add role..."
+                          value={roleSearch}
+                          onChange={(e) => {
+                            setRoleSearch(e.target.value);
+                            setShowRoleSuggestions(true);
+                          }}
+                          onFocus={() => setShowRoleSuggestions(true)}
+                        />
+
+                        {/* Role Suggestions Dropdown */}
+                        <AnimatePresence>
+                          {showRoleSuggestions &&
+                            roleSuggestions.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="absolute z-20 w-full mt-2 bg-white border border-outline-variant rounded-xl shadow-xl overflow-hidden"
+                              >
+                                {roleSuggestions.map((suggestion) => (
+                                  <button
+                                    key={suggestion}
+                                    onClick={() =>
+                                      addRoleFromLibrary(suggestion)
+                                    }
+                                    className="w-full px-4 py-3 text-left text-xs font-bold hover:bg-primary/5 hover:text-primary transition-colors border-b border-outline-variant/30 last:border-0"
+                                  >
+                                    {suggestion}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-4 block">
+                    Work Environment
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                    {[
+                      {
+                        id: "remote-first",
+                        title: "Remote First",
+                        desc: "Distributed-first culture with occasional travel.",
+                      },
+                      {
+                        id: "onsite-hybrid",
+                        title: "On-Site / Hybrid",
+                        desc: "Requires a physical presence in the office hub.",
+                      },
+                    ].map((env) => (
+                      <button
+                        key={env.id}
+                        onClick={() => setWorkEnvironment(env.id)}
+                        className={`w-full p-6 text-left border-2 rounded-xl flex items-start gap-4 transition-all group
+                          ${workEnvironment === env.id ? "border-primary shadow-lg shadow-primary/5 bg-primary/2" : "border-outline-variant/60 hover:border-primary/40"}
+                        `}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-all bg-white
+                          ${workEnvironment === env.id ? "border-primary ring-4 ring-primary/10" : "border-outline-variant group-hover:border-primary/40"}
+                        `}
+                        >
+                          {workEnvironment === env.id && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold mb-1 tracking-tight">
+                            {env.title}
+                          </h4>
+                          <p className="text-xs text-on-surface-variant/80 font-medium leading-relaxed">
+                            {env.desc}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Footer Actions */}
+          <footer className="mt-12 md:mt-16 pt-8 border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-6 pb-12">
+            <button
+              onClick={onPrev}
+              className="flex items-center gap-2.5 text-sm font-bold text-on-surface-variant hover:text-primary transition-all group active:scale-95"
+            >
+              <ChevronRight
+                className="rotate-180 group-hover:-translate-x-1 transition-transform"
+                size={18}
+                strokeWidth={3}
+              />{" "}
+              Previous
+            </button>
+            <motion.button
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98, y: 0 }}
+              onClick={onNext}
+              className="w-full sm:w-auto primary-gradient text-on-primary px-10 py-4 rounded-xl font-bold text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all tracking-tight"
+            >
+              Continue Journey
+            </motion.button>
+          </footer>
+        </div>
+      
+    
+  );
+  /* return (
     <div className="max-w-4xl mx-auto pb-20">
       <header className="mb-12">
         <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
@@ -1678,7 +2460,7 @@ function CareerGoalsView({
         </footer>
       </div>
     </div>
-  );
+  );*/
 }
 
 function SkillsInterests({ onPrev }: { onPrev: () => void }) {
@@ -1981,7 +2763,7 @@ function SelectFieldUp({
   );
 }
 
-function SelectionCard({
+/*function SelectionCard({
   icon,
   title,
   subtitle,
@@ -2019,7 +2801,7 @@ function SelectionCard({
       </div>
     </label>
   );
-}
+}*/
 
 function SkillBadge({ label, active }: { label: string; active?: boolean }) {
   return (
